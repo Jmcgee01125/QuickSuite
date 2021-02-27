@@ -2,9 +2,9 @@
 
 A collection of batch tools to do various menial tasks quickly.
 
-:: -------------------------------------
-:: CURRENT TOOLS
-:: -------------------------------------
+:: ------------------------------------- :: 
+CURRENT TOOLS 
+:: ------------------------------------- ::
 
 QuickConv: converts a series of images (0001.png, 0002.png, etc) into a video file.
 
@@ -12,9 +12,9 @@ QuickCompress: automatically compresses a video below a certain size. Useful for
 
 QuickNote: allows creating a notes file into a directory from anywhere on the computer without having to save-as.
 
-:: -------------------------------------
-:: FFMPEG NOTE
-:: -------------------------------------
+:: ------------------------------------- :: 
+FFMPEG NOTE 
+:: ------------------------------------- ::
 
 !! YOU MUST INSTALL FFMPEG TO USE QUICKCONV AND QUICKCOMPRESS
 
@@ -27,9 +27,9 @@ I've also included ffmpeg.exe (Version 2021-2-20) in the repo. You can download 
 
 ffmpeg.exe will need to be in the SAME DIRECTORY as any batch file using it. Otherwise, it won't work.
 
-:: -------------------------------------
-:: LICENSING
-:: -------------------------------------
+:: ------------------------------------- :: 
+LICENSING 
+:: ------------------------------------- ::
 
 I am releasing my files under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
 
