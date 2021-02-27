@@ -1,3 +1,5 @@
+@echo off
+
 :: -------------------------------------
 
 :: QuickNote Version 1.1
@@ -11,13 +13,17 @@
 
 :: Settings
 
-:: location that the new documents will be created
-set location=%USERPROFILE%\Downloads\Sorted Items\QuickNotes
+:: Location that the new documents will be created
+set location=%USERPROFILE%\Downloads\QuickNotes
 
-:: template document that will be copied from, should be AT LEAST a blank document
-set template=%USERPROFILE%\Downloads\Sorted Items\QuickNotes\00_TEMPLATE.docx
+:: Template document that will be copied from, should be AT LEAST a blank document, but may contain text
+set template=%USERPROFILE%\Downloads\QuickNotes\00_TEMPLATE.docx
 
 :: -------------------------------------
+
+:: Code
+
+title QuickNote
 
 :: create timestamp in the form MM-DD-YYYY_HHhMMmSSs
 if "%time:~0,1%"==" " (set timestamp=%date:~-10,2%"-"%date:~-7,2%"-"%date:~-4,4%"_0"%time:~1,1%"h"%time:~3,2%"m"%time:~6,2%"s") else (set timestamp=%date:~-10,2%"-"%date:~-7,2%"-"%date:~-4,4%"_"%time:~0,2%"h"%time:~3,2%"m"%time:~6,2%"s")
