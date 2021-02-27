@@ -24,16 +24,17 @@ You can download FFmpeg from https://www.wikihow.com/Install-FFmpeg-on-Windows (
 
 Make sure to add it to your system's PATH variable. The guide covers this as well, or you can go edit environment variables yourself.
 
-I may package FFmpeg with this tool in the future, but for now the above will work.
+
+I've also included ffmpeg.exe (Version 2021-2-20) in the repo. You can download that as well if you're not comfortable with editing PATH.
+
+This exe will need to be in the SAME DIRECTORY as any batch file using it. Otherwise it won't work.
 
 ---------------------
 LICENSING
 ---------------------
 
-CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+I am releasing my files under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
 
-Feel free to redistribute this software as-is or with modifications.
+FFmpeg is licensed under GNU LGPL 2.1, and I (unsurprisingly) do not own it.
 
-I could not really care less, just don't claim you made this.
-
-	-Jmcgee1125
+Feel free to redistribute this software as-is or with modifications. I could not really care less, just don't claim you made this.
