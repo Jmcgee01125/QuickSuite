@@ -31,8 +31,6 @@ ffmpeg.exe will need to be in the SAME DIRECTORY as any batch file using it. Oth
 LICENSING 
 :: ------------------------------------- ::
 
-I am releasing my files under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+I am releasing my files under the MIT License as described in the LICENSE.md file.
 
-FFmpeg is licensed under GNU LGPL 2.1 and I (unsurprisingly) do not own it.
-
-Feel free to redistribute this software as-is or with modifications. I could not really care less, just don't claim you made this.
+FFmpeg, however, is licensed under GNU LGPL 2.1, as I am not its original creator (unsurprisingly).
