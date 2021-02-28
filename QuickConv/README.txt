@@ -17,6 +17,8 @@ Images must have a static filename length, so 1..100 is not allowed but 001..100
 
 To render only a portion of the video, remove the frames outside of the range. QuickConv.bat works fine if the first image is, for example, 0005.png.
 	Note that you must still have a continuous range of frames. The program will stop once there is no next frame.
+	There seems to be some limit to how far in you can start. I was unable to render beginning at frame 112 in one circumstance.
+		As a remedy, run QuickConv_OffsetRenamer.bat to shift all frames down to start at frame 1. 
 
 The input is formatted as <pre><frame number><end>.<extension>
 	Spaces are allowed in pre and end.
