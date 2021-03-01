@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickConv Version 1.4
+QuickConv Version 1.5
 
 :: -------------------------------------
 
@@ -36,6 +36,10 @@ Current options are the following:
 	num=INTEGER - the number of digits in the input images (for example, 0001.png is 4).
 	pre=STRING  - words that appear before the filename, such as "hello" in hello0002.png.
 	end=STRING  - words that appear after the filename, such as "world" in 0025world.png.
+	mob=y/n     - yes or no to use motion blur, will ignore motion blur variables if n.
+	mbf         - final fps if using motion blur (for frameblending from high fps).
+	mfp         - number of frames before a new blended frame will be considered.
+	              for example, an mfp of 10 and framerate of 60 will cause 6 frames to blend into each output frame.
 
 :: -------------------------------------
 

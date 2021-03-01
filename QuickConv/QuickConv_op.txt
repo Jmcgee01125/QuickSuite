@@ -2,3 +2,7 @@ fps=30
 num=4
 pre=
 end=
+aud=
+mob=n
+mbf=30
+mfp=20
