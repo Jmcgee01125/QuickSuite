@@ -25,7 +25,7 @@ Make sure to add it to your system's PATH variable. The guide covers this as wel
 
 I've also included ffmpeg.exe (Version 2021-2-20) in the repo. You can download that as well if you're not comfortable with editing PATH.
 
-ffmpeg.exe will need to be in the SAME DIRECTORY as any batch file using it. Otherwise, it won't work.
+If using this ffmpeg.exe, it will need to be in the SAME DIRECTORY as any batch file using it. This does not apply for the full installation.
 
 :: ------------------------------------- :: 
 LICENSING 
