@@ -5,4 +5,4 @@ end=
 aud=
 mob=n
 mbf=30
-mfp=20
+mfp=30
