@@ -24,7 +24,6 @@ set mbr=20M
 set abr=196K
 
 :: Source image file type (default: png)
-:: Use at your own "risk" as only pngs were tested, but this option is available
 set filetype=png
 
 :: -------------------------------------
