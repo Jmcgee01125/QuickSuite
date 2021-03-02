@@ -47,3 +47,10 @@ By opening QuickConv.bat, three variables become available:
 	opsfile - string pointing to the settings file that will be used at runtime (default: QuickConv_op.txt).
 	mbr - Maximum bitrate (only used by the webm and mp4 outputs) (default: 20M).
 	filetype - Image source file type, note that only pngs have been tested (default: png).
+
+:: -------------------------------------
+
+Some quick tips for motion blur:
+	1) Try to start with a higher source FPS (like, hundreds of FPS). Since this blurring technique is simply layering frames, having more source frames boosts quality.
+	2) For the most correct results, set the mbf and mfp values equal to each other. This will mean that the unused in-between frames are blended, not "real" frames.
+	3) If you're getting too much blur or the end result looks choppy, decrease mfp. Less frames will be blended, giving a sharper image.
