@@ -14,10 +14,10 @@
 :: Settings
 
 :: First frame 
-set in=10
+set in=420
 
 :: Last frame
-set out=14
+set out=1337
 
 :: Number of digits in the frame number, such as 4 for 0125.png
 set num=4
