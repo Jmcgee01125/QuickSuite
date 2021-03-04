@@ -28,6 +28,18 @@ I've also included ffmpeg.exe (Version 2021-2-20) in the repo. You can download 
 If using this ffmpeg.exe, it will need to be in the SAME DIRECTORY as any batch file using it. This does not apply for the full installation.
 
 :: ------------------------------------- :: 
+VARIABLE USAGE NOTE 
+:: ------------------------------------- ::
+
+All of these programs contain variables inside the batch files themselves. You may need to change these for the program to work properly.
+
+To edit those variables, right click the program in your file browser and select "edit" from the menu.
+
+Variables to change are at the top of the file (under the "Settings" section), and have a short description of their use.
+
+If a file is not working correctly for you (fails to do its job or crashes instantly), this is the most likely cause of issues.
+
+:: ------------------------------------- :: 
 LICENSING 
 :: ------------------------------------- ::
 
