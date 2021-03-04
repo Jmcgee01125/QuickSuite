@@ -14,10 +14,10 @@
 :: Settings
 
 :: First frame 
-set in=1
+set in=10
 
 :: Last frame
-set out=1000
+set out=14
 
 :: Number of digits in the frame number, such as 4 for 0125.png
 set num=4
@@ -46,7 +46,7 @@ for /l %%x in (0, 1, %num%) do (
 	set /a suffering=!suffering! * 10
 )
 
-set pain=%suffering%
+set /a pain=suffering + in - 1
 
 for /l %%y in (%in%, 1, %out%) do (
 	set /a suffering+=1
