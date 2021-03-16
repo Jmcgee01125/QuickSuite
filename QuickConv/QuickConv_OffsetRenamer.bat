@@ -19,7 +19,7 @@ set in=420
 :: Last frame
 set out=1337
 
-:: Number of digits in the frame number, such as 4 for 0125.png
+:: Number of newframe in the frame number, such as 4 for 0125.png
 set num=4
 
 :: File extension, such as png in 1254.png
@@ -40,17 +40,17 @@ title QuickConv Offset Renamer
 setlocal EnableDelayedExpansion
 
 set /a num-=1
-set suffering=1
+set newframe=1
 
 for /l %%x in (0, 1, %num%) do (
-	set /a suffering=!suffering! * 10
+	set /a newframe=!newframe! * 10
 )
 
-set /a pain=suffering + in - 1
+set /a realframe=newframe + in - 1
 
 for /l %%y in (%in%, 1, %out%) do (
-	set /a suffering+=1
-	set /a pain+=1
-	echo %pre%!pain:~1!%end%.%ext% %pre%!suffering:~1!%end%.%ext%
-	ren %pre%!pain:~1!%end%.%ext% %pre%!suffering:~1!%end%.%ext%
+	set /a newframe+=1
+	set /a realframe+=1
+	echo %pre%!realframe:~1!%end%.%ext% %pre%!newframe:~1!%end%.%ext%
+	ren %pre%!realframe:~1!%end%.%ext% %pre%!newframe:~1!%end%.%ext%
 )
