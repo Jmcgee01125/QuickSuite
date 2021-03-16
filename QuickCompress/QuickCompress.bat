@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.2b
+:: QuickCompress Version 1.2c
 
 :: -------------------------------------
 
@@ -12,22 +12,23 @@
 
 :: Settings
 
-:: Automatically determines maximum bitrate based on the target output size in KB (defaults: 1, 8000, 512)
+:: Automatically determines maximum bitrate based on the target output size in KB (defaults: 1, 8000, 512, 256)
 :: Note that there are some scenarios where the file still exceeds the target. In this case, try reducing target output size.
 :: To disable, set UseSmartBitrate to 0
 set UseSmartBitrate=1
 set TargetOutputSizeKB=8000
-set WarnForLowDetailThreshold=512
+set WarnForLowDetailThresholdMP4=512
+set WarnForLowDetailThresholdWebm=256
 
 :: Default maximum bitrate (in Kb), if not using smart bitrate (default: 2000)
 set mbr=2000
 
-:: Default audio bitrate (in Kb), used with or without smart bitrate.
-:: To use source rate, set as "src" (default: 196)
-set abr=196
+:: Default audio bitrate (in Kb), used with or without smart bitrate. Recommended no more than 196 for most uses.
+:: To use source rate, set as "src" (default: src)
+set abr=src
 
 :: Use webm (vp9) instead of mp4 (x264) (default: 0)
-:: Not recommended for quick compressions, but can achieve higher detail at lower bitrates (sub 500K).
+:: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
 set UseWebm=0
 
 :: -------------------------------------
@@ -56,9 +57,10 @@ set /p op=
 if /I "%op%"=="n" goto CHANGESET
 
 :COMPRESS
-if %UseWebm%==1 goto :WEBMCOMPRESS
+if %UseWebm%==1 goto WEBMCOMPRESS
 :: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video x264 outputname
 ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K -c:v libx264 "%name%_qc.mp4"
+pause
 exit
 
 :WEBMCOMPRESS
@@ -84,11 +86,25 @@ if %UseWebm%==1 (
 )
 set /a mbr=mbr - abr - buffer
 
-if %mbr% LEQ %WarnForLowDetailThreshold% goto CONFIRMLOWDETAIL
+if %mbr% LEQ 0 goto ERROR_bitratetoolow
+
+if %mbr% LEQ %WarnForLowDetailThresholdMP4% if %UseWebm%==0 goto CONFIRMLOWDETAIL
+if %mbr% LEQ %WarnForLowDetailThresholdWebm% if %UseWebm%==1 goto CONFIRMLOWDETAILWEBM
+pause
 goto COMPRESS
 
 :CONFIRMLOWDETAIL
-echo Warning: Video bitrate is very low (^< %WarnForLowDetailThreshold% Kbps).
+echo Warning: MP4 video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdMP4% Kbps).
+echo This will drastically affect the video quality.
+echo Do you wish to continue with mp4 (m), switch to webm (w), or cancel (c)? (m/W/c):
+set /p cont=
+if /I "%cont%"=="m" goto COMPRESS
+if /I "%cont%"=="c" exit
+set UseWebm=1
+goto SMARTMBRCALC
+
+:CONFIRMLOWDETAILWEBM
+echo Warning: Webm video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdWebm% Kbps).
 echo This will drastically affect the video quality.
 echo Do you wish to continue? (Y/n):
 set /p cont=
@@ -110,6 +126,44 @@ set /p abr=<quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
 del quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
 set /a abr=abr / 1000
 goto RETURNINTRO
+
+:: if the bitrate is below zero then ffmpeg crashes, so it should be handled
+:ERROR_bitratetoolow
+echo The calculated bitrate necessary to get the video under the target size is less than 0 (%mbr%).
+echo It is impossible to compress at this bitrate (because there would be no video, of course).
+echo You can remedy this by reducing the length of your file or taking one of the actions below:
+if %UseWebm%==0 goto ERR_btlmp4
+if %UseWebm%==1 goto ERR_btlwebm
+:ERR_btlwebm
+echo a - Set a custom audio bitrate (currently %abr%)
+echo v - Use static video bitrate (may exceed target size)
+echo m - Switch to mp4
+echo c - Cancel
+echo (a/v/M/c):
+set /p sel=
+if /I "%sel%"=="a" goto ERR_btlcustomaudio
+if /I "%sel%"=="v" goto ERR_btlcustomvideo
+if /I "%sel%"=="c" exit
+set UseWebm=0
+GOTO SMARTMBRCALC
+:: currently assumes that mp4 is always smaller than webm. This is generally true, but in some circumstances it isn't
+:ERR_btlmp4
+echo a - Set a custom audio bitrate (currently %abr%)
+echo v - Use static video bitrate (may exceed target size)
+echo c - Cancel
+echo (a/v/C):
+set /p sel=
+if /I "%sel%"=="a" goto ERR_btlcustomaudio
+if /I "%sel%"=="v" goto ERR_btlcustomvideo
+exit
+:ERR_btlcustomaudio
+echo Please enter custom audio bitrate (in Kbps):
+set /p abr=
+goto SMARTMBRCALC
+:ERR_btlcustomvideo
+echo Please enter a static video bitrate (in Kbps):
+set /p mbr=
+goto COMPRESS
 
 :ERROR_file
 echo Error: please drag a file onto this program to use it.
