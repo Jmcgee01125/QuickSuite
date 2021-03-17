@@ -12,6 +12,8 @@ QuickCompress: automatically compresses a video below a certain size, which is u
 
 QuickNote: allows creating a note-taking file in an arbitrary directory from anywhere on the computer without having to save-as.
 
+QuickTrim: trims a video based on user-selected timestamps.
+
 :: ------------------------------------- :: 
 FFMPEG NOTE 
 :: ------------------------------------- ::
