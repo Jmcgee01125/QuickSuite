@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.2c
+:: QuickCompress Version 1.2d
 
 :: -------------------------------------
 
@@ -60,7 +60,6 @@ if /I "%op%"=="n" goto CHANGESET
 if %UseWebm%==1 goto WEBMCOMPRESS
 :: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video x264 outputname
 ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K -c:v libx264 "%name%_qc.mp4"
-pause
 exit
 
 :WEBMCOMPRESS
@@ -90,7 +89,6 @@ if %mbr% LEQ 0 goto ERROR_bitratetoolow
 
 if %mbr% LEQ %WarnForLowDetailThresholdMP4% if %UseWebm%==0 goto CONFIRMLOWDETAIL
 if %mbr% LEQ %WarnForLowDetailThresholdWebm% if %UseWebm%==1 goto CONFIRMLOWDETAILWEBM
-pause
 goto COMPRESS
 
 :CONFIRMLOWDETAIL
