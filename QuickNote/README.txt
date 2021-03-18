@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickNote Version 1.1
+QuickNote Version 1.2
 
 :: -------------------------------------
 
@@ -13,6 +13,7 @@ To prepare, set the variables for location and template in QuickNote.bat
 	The default %USERPROFILE% points to C:\Users\<this user>\
 	Location specifies where the resulting file will be saved.
 	Template specifies the default file. This is usually a blank Word document, but can be any type (.odf, .txt, etc).
+		If no template is found, the program will tell you. Right click -> Edit to access QuickNote.bat and enter the name.
 	Spaces in filenames are allowed, there simply aren't any in the default settings.
 
 The output will be saved as <timestamp>.<extension> in the location folder.
