@@ -1,6 +1,6 @@
 # QuickSuite
 
-A collection of batch tools to do various menial tasks quickly.
+A collection of batch tools to do various tasks quickly, with a special focus on video operations.
 
 :: ------------------------------------- :: 
 CURRENT TOOLS 
@@ -22,13 +22,13 @@ FFMPEG NOTE
 
 !! YOU MUST INSTALL FFMPEG TO USE MOST OF THESE PROGRAMS
 
-You can download FFmpeg from https://www.wikihow.com/Install-FFmpeg-on-Windows (directs to https://ffmpeg.org/download.html).
+You can find instructions to download FFmpeg from https://www.wikihow.com/Install-FFmpeg-on-Windows (directs to https://ffmpeg.org/download.html).
 
-Make sure to add it to your system's PATH variable. The guide covers this as well, or you can go edit environment variables yourself.
+Make sure to add it to your system's PATH variable. The guide covers this as well, or you can go edit environment variables yourself if familiar.
 
 ffmpeg.exe (Version 2021-2-20) is included in the repo. You can download that as well if you're not comfortable with editing PATH.
 
-If using this ffmpeg.exe, it will need to be in the SAME DIRECTORY as any batch file using it. This does not apply for the full installation.
+If using this ffmpeg.exe, it will need to be in the SAME DIRECTORY as any batch file using it. This does not apply for the full installation with PATH.
 
 :: ------------------------------------- :: 
 VARIABLE USAGE NOTE 
@@ -46,6 +46,6 @@ If a file is not working correctly for you (fails to do its job or crashes insta
 LICENSING 
 :: ------------------------------------- ::
 
-QuickSuit files are released under the MIT License as described in the LICENSE.md file.
+QuickSuite files are released under the MIT License as described in the LICENSE.md file.
 
 FFmpeg, however, is licensed under the GNU LGPL 2.1 license.
