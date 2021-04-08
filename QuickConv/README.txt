@@ -17,7 +17,7 @@ Images must have a static filename length, so 1..100 is not allowed but 001..100
 
 To render only a portion of the video, remove the frames outside of the range. QuickConv.bat works fine if the first image is, for example, 0005.png.
 	Note that you must still have a continuous range of frames. The program will stop once there is no next frame.
-	There seems to be some limit to how far in you can start. I was unable to render beginning at frame 112 in one circumstance.
+	There seems to be some limit to how far in you can start, but I can't narrow it down. I was unable to render beginning at frame 112 in one circumstance.
 		As a remedy, run QuickConv_OffsetRenamer.bat to shift all frames down to start at frame 1. 
 
 The input is formatted as <pre><frame number><end>.<extension>
@@ -32,12 +32,12 @@ Make sure to change the settings in QuickConv_op.txt to your personal defaults.
 	This can be overridden during runtime.
 
 Current options are the following:
-	fps=INTEGER - determines the frames per second of the output.
+	fps=INTEGER - determines the frames per second of the output. Refers to source fps if motion blur is enabled.
 	num=INTEGER - the number of digits in the input images (for example, 0001.png is 4).
 	pre=STRING  - words that appear before the filename, such as "hello" in hello0002.png.
 	end=STRING  - words that appear after the filename, such as "world" in 0025world.png.
 	mob=y/n     - yes or no to use motion blur, will ignore motion blur variables if n.
-	mbf=INTEGER - final fps if using motion blur (for frameblending from high fps).
+	mbf=INTEGER - final fps if using motion blur (for frameblending from high fps). Will trim down to this framerate from the source fps.
 	mfp=INTEGER - number of frames before a new blended frame will be considered.
 	              for example, an mfp of 10 and framerate of 60 will cause 6 frames to blend into each output frame.
 
