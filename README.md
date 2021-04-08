@@ -26,9 +26,7 @@ You can find instructions to download FFmpeg from https://docs.google.com/docume
 
 Make sure to add it to your system's PATH variable. The guide covers this as well, or you can go edit environment variables yourself if familiar.
 
-ffmpeg.exe (Version 2021-2-20) is included in the repo. You can download that as well if you're not comfortable with editing PATH. This may not work as well as the full installation.
-
-If using this ffmpeg.exe, it will need to be in the SAME DIRECTORY as any batch file using it. This does not apply for the full installation with PATH.
+Alternatively, you can instead run these batch files in the FFmpeg/bin folder (where ffmpeg.exe and ffprobe.exe are). You'll still have to download FFmpeg from the website.
 
 :: ------------------------------------- :: 
 VARIABLE USAGE NOTE 
