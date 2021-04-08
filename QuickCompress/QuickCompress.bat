@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.2d
+:: QuickCompress Version 1.3
 
 :: -------------------------------------
 
@@ -12,12 +12,12 @@
 
 :: Settings
 
-:: Automatically determines maximum bitrate based on the target output size in KB (defaults: 1, 8000, 512, 256)
+:: Automatically determines maximum bitrate based on the target output size in KB (defaults: 1, 8000, 1024, 256)
 :: Note that there are some scenarios where the file still exceeds the target. In this case, try reducing target output size.
 :: To disable, set UseSmartBitrate to 0
 set UseSmartBitrate=1
 set TargetOutputSizeKB=8000
-set WarnForLowDetailThresholdMP4=512
+set WarnForLowDetailThresholdMP4=1024
 set WarnForLowDetailThresholdWebm=256
 
 :: Default maximum bitrate (in Kb), if not using smart bitrate (default: 2000)
@@ -29,7 +29,13 @@ set abr=src
 
 :: Use webm (vp9) instead of mp4 (x264) (default: 0)
 :: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
+:: Has a higher priority than NVENC, if both are enabled.
 set UseWebm=0
+
+:: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
+:: Can be faster than a CPU encode, but might not be supported on all systems.
+:: Can still be enabled if not present, will simply turn itself back off after a check (a few seconds unfortunately).
+set UseNVENC=1
 
 :: -------------------------------------
 
@@ -45,8 +51,11 @@ set name=%~n1%
 
 :: if using same audio bitrate, detect it
 if "%abr%"=="src" goto FINDSRCABR
-
 :RETURNINTRO
+
+if %UseNVENC%==1 goto CHECKNVENC
+:RETURNINTRO_PRE
+
 if %UseSmartBitrate%==1 goto SMARTMBRCALC
 
 :: not using smart bitrate, so confirm that the settings are to the user's liking
@@ -57,14 +66,14 @@ set /p op=
 if /I "%op%"=="n" goto CHANGESET
 
 :COMPRESS
-if %UseWebm%==1 goto WEBMCOMPRESS
-:: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video x264 outputname
-ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K -c:v libx264 "%name%_qc.mp4"
-exit
-
-:WEBMCOMPRESS
-:: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video vp9 outputname
-ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K -c:v vp9 "%name%_qc.webm"
+set codec=libx264
+set extension=mp4
+if %UseWebm%==1 (
+	set codec=vp9
+	set extension=webm
+) else ( if %UseNVENC%==1 set codec=h264_nvenc )
+:: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video codec outputname
+ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K -c:v %codec% "%name%_qc.%extension%"
 exit
 
 :SMARTMBRCALC
@@ -81,7 +90,9 @@ set /a mbr=%targetkbit% / dur
 if %UseWebm%==1 (
 	set /a buffer=mbr / 3
 ) else (
-	set /a buffer=mbr / 12
+	if %UseNVENC%==1 (
+		set /a buffer=mbr / 10
+	) else ( set /a buffer=mbr / 12 )
 )
 set /a mbr=mbr - abr - buffer
 
@@ -92,6 +103,7 @@ if %mbr% LEQ %WarnForLowDetailThresholdWebm% if %UseWebm%==1 goto CONFIRMLOWDETA
 goto COMPRESS
 
 :CONFIRMLOWDETAIL
+:: also used for nvenc
 echo Warning: MP4 video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdMP4% Kbps).
 echo This will drastically affect the video quality.
 echo Do you wish to continue with mp4 (m), switch to webm (w), or cancel (c)? (m/W/c):
@@ -125,8 +137,24 @@ del quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
 set /a abr=abr / 1000
 goto RETURNINTRO
 
+:CHECKNVENC
+:: output the ffmpeg build config to a temporary file
+ffmpeg -buildconf > quickcomptempforconfirmingnvencisusuable.txt
+:: loop over the file and check for an occurrance of nvenc support
+set found=0
+for /f "delims=" %%a in (quickcomptempforconfirmingnvencisusuable.txt) do (
+	echo %%a|find "    --enable-nvenc" >nul
+	if errorlevel 1 (echo.>nul) else (set found=1)
+)
+del quickcomptempforconfirmingnvencisusuable.txt
+:: no you can't have nvenc you have baby gpu
+if %found%==0 set UseNVENC=0
+goto RETURNINTRO_PRE
+
 :: if the bitrate is below zero then ffmpeg crashes, so it should be handled
+:: also disabling nvenc immediately because it's the smallest overhead so failing this is already a loss
 :ERROR_bitratetoolow
+set UseNVENC=0
 echo The calculated bitrate necessary to get the video under the target size is less than 0 (%mbr%).
 echo It is impossible to compress at this bitrate (because there would be no video, of course).
 echo You can remedy this by reducing the length of your file or taking one of the actions below:

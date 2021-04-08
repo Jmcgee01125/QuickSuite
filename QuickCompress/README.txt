@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.2d
+QuickCompress Version 1.3
 
 :: -------------------------------------
 
@@ -28,3 +28,6 @@ By opening QuickCompress.bat, seven variables become available:
 	UseWebm - Uses webm/VP9 instead of mp4/x264 by default. Takes longer to encode, but has superior compression at low bitrates (default: 0).
 		Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
 		Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
+	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 1).
+		QuickCompress runs a check when starting if UseNVENC=1. This takes a couple seconds, but prevents crashing.
+	
