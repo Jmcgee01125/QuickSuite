@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.3
+:: QuickCompress Version 1.3b
 
 :: -------------------------------------
 
@@ -91,7 +91,7 @@ if %UseWebm%==1 (
 	set /a buffer=mbr / 3
 ) else (
 	if %UseNVENC%==1 (
-		set /a buffer=mbr / 10
+		set /a buffer=mbr / 6
 	) else ( set /a buffer=mbr / 12 )
 )
 set /a mbr=mbr - abr - buffer
@@ -140,6 +140,7 @@ goto RETURNINTRO
 :CHECKNVENC
 :: output the ffmpeg build config to a temporary file
 ffmpeg -buildconf > quickcomptempforconfirmingnvencisusuable.txt
+echo Checking for nvenc support...
 :: loop over the file and check for an occurrance of nvenc support
 set found=0
 for /f "delims=" %%a in (quickcomptempforconfirmingnvencisusuable.txt) do (
