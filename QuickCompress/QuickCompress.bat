@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.3d
+:: QuickCompress Version 1.3e
 
 :: -------------------------------------
 
@@ -150,14 +150,13 @@ if %found%==0 set UseNVENC=0
 goto RETURNINTRO_PRE
 
 :: if the bitrate is below zero then ffmpeg crashes, so it should be handled
-:: also disabling nvenc immediately because regular mp4 will have a smaller overhead, so we already know that will be better
 :ERROR_bitratetoolow
-set UseNVENC=0
 echo The calculated bitrate necessary to get the video under the target size is less than 0 (%mbr%).
 echo It is impossible to compress at this bitrate (because there would be no video, of course).
 echo You can remedy this by reducing the length of your file or taking one of the actions below:
 if %UseWebm%==0 goto ERR_btlmp4
 if %UseWebm%==1 goto ERR_btlwebm
+
 :ERR_btlwebm
 echo a - Set a custom audio bitrate (currently %abr%)
 echo v - Use static video bitrate (may exceed target size)
@@ -170,8 +169,11 @@ if /I "%sel%"=="v" goto ERR_btlcustomvideo
 if /I "%sel%"=="c" exit
 set UseWebm=0
 GOTO SMARTMBRCALC
+
 :: currently assumes that mp4 is always smaller than webm. This is generally true, but in some circumstances it isn't
+:: nvenc is disabled at this stage due to buffer sizing
 :ERR_btlmp4
+set UseNVENC=0
 echo a - Set a custom audio bitrate (currently %abr%)
 echo v - Use static video bitrate (may exceed target size)
 echo c - Cancel
@@ -180,10 +182,12 @@ set /p sel=
 if /I "%sel%"=="a" goto ERR_btlcustomaudio
 if /I "%sel%"=="v" goto ERR_btlcustomvideo
 exit
+
 :ERR_btlcustomaudio
 echo Please enter custom audio bitrate (in Kbps):
 set /p abr=
 goto SMARTMBRCALC
+
 :ERR_btlcustomvideo
 echo Please enter a static video bitrate (in Kbps):
 set /p mbr=
