@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickConv Version 1.5
+:: QuickConv Version 1.6
 
 :: -------------------------------------
 
@@ -41,11 +41,12 @@ if exist "%opsfile%" (
 :CONVERSION
 echo.
 echo Please choose an output file format:
-echo 1 - avi  (raw)
-echo 2 - avi  (huffyuv)
-echo 3 - webm (vp9)
-echo 4 - mp4  (x264)
-echo 5 - CANCEL OPERATION
+echo 1 - avi  (raw)      - perfect quality
+echo 2 - avi  (huffyuv)  - near-perfect quality
+echo 3 - webm (vp9)      - good compression, slow
+echo 4 - mp4  (cpu x264) - small file size
+echo 5 - mp4  (gpu h264) - small file size, fastest, requires nvenc-enabled GPU
+echo 6 - CANCEL OPERATION
 echo Selection (default 4): 
 set /p sel=
 
@@ -62,6 +63,10 @@ if "%sel%"=="1" (
 	set codec=vp9
 	set outtype=webm
 ) else if "%sel%"=="5" (
+	set bitrate=-b:v %mbr%
+	set codec=h264_nvenc
+	set outtype=mp4
+) else if "%sel%"=="6" (
 	exit
 ) else (
 	set bitrate=-b:v %mbr%

@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickConv Version 1.5
+QuickConv Version 1.6
 
 :: -------------------------------------
 
@@ -22,6 +22,7 @@ To render only a portion of the video, remove the frames outside of the range. Q
 
 The input is formatted as <pre><frame number><end>.<extension>
 	Spaces are allowed in pre and end.
+
 The output will be saved as output.<type selection>
 
 The usage itself should be self explanatory. Just run QuickConv.bat and confirm settings.
