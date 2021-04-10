@@ -29,5 +29,5 @@ By opening QuickCompress.bat, seven variables become available:
 		Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
 		Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
 	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 1).
-		QuickCompress runs a check when starting if UseNVENC=1. This takes a couple seconds, but prevents crashing.
+		QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
 	
