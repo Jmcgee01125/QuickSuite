@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.3c
+:: QuickCompress Version 1.3d
 
 :: -------------------------------------
 
@@ -138,16 +138,13 @@ set /a abr=abr / 1000
 goto RETURNINTRO
 
 :CHECKNVENC
-:: output the ffmpeg build config to a temporary file
-ffmpeg -buildconf > quickcomptempforconfirmingnvencisusuable.txt
 :: print status message due to potential lag if it's a really slow cpu
 echo Checking for nvenc support...
-:: loop over the file and check for an occurrance of nvenc support
+:: loop over the ffmpeg build config and check for an occurrance of nvenc support
 set found=0
-for /f "delims=" %%a in (quickcomptempforconfirmingnvencisusuable.txt) do (
+for /f "delims=" %%a in ('ffmpeg -buildconf') do (
 	if "%%a"=="    --enable-nvenc" (set found=1)
 )
-del quickcomptempforconfirmingnvencisusuable.txt
 :: no you can't have nvenc you have baby gpu
 if %found%==0 set UseNVENC=0
 goto RETURNINTRO_PRE
