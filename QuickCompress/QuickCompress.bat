@@ -34,7 +34,7 @@ set UseWebm=0
 
 :: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
-:: Can still be enabled if not present, will simply turn itself back off after a check (a few seconds unfortunately).
+:: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
 
 :: -------------------------------------
@@ -153,7 +153,7 @@ if %found%==0 set UseNVENC=0
 goto RETURNINTRO_PRE
 
 :: if the bitrate is below zero then ffmpeg crashes, so it should be handled
-:: also disabling nvenc immediately because it's the smallest overhead so failing this is already a loss
+:: also disabling nvenc immediately because regular mp4 will have a smaller overhead, so we already know that will be better
 :ERROR_bitratetoolow
 set UseNVENC=0
 echo The calculated bitrate necessary to get the video under the target size is less than 0 (%mbr%).
