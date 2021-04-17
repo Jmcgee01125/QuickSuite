@@ -79,7 +79,6 @@ if %UseWebm%==1 (
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
 :: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video codec outputname
 ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K %mbops% -c:v %codec% "%name%_qc.%extension%"
-pause
 exit
 
 :SMARTMBRCALC
