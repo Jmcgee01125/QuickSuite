@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.3e
+:: QuickCompress Version 1.4
 
 :: -------------------------------------
 
@@ -37,6 +37,10 @@ set UseWebm=0
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
 
+:: Enables a motion blur effect created by blending frames around the current frame (defaults: 0, 2)
+set UseMB=0
+set MBFrames=2
+
 :: -------------------------------------
 
 :: Code
@@ -66,6 +70,7 @@ set /p op=
 if /I "%op%"=="n" goto CHANGESET
 
 :COMPRESS
+if %UseMB%==1 ( set mbops=-filter:v ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
 set codec=libx264
 set extension=mp4
 if %UseWebm%==1 (
@@ -73,7 +78,8 @@ if %UseWebm%==1 (
 	set extension=webm
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
 :: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video codec outputname
-ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K -c:v %codec% "%name%_qc.%extension%"
+ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K %mbops% -c:v %codec% "%name%_qc.%extension%"
+pause
 exit
 
 :SMARTMBRCALC
