@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.4
+:: QuickCompress Version 1.4b
 
 :: -------------------------------------
 
@@ -24,13 +24,14 @@ set WarnForLowDetailThresholdWebm=256
 set mbr=2000
 
 :: Default audio bitrate (in Kb), used with or without smart bitrate. Recommended no more than 196 for most uses.
+:: Original audio is preserved for mp4, but webm will automatically remux. It will sound effectively identical.
 :: To use source rate, set as "src" (default: src)
 set abr=src
 
 :: Use webm (vp9) instead of mp4 (x264) (default: 0)
 :: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
 :: Has a higher priority than NVENC, if both are enabled.
-set UseWebm=0
+set UseWebm=1
 
 :: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
@@ -54,6 +55,7 @@ if [%1]==[] goto ERROR_file
 set name=%~n1%
 
 :: if using same audio bitrate, detect it
+set srcaud=0
 if "%abr%"=="src" goto FINDSRCABR
 :RETURNINTRO
 
@@ -70,15 +72,20 @@ set /p op=
 if /I "%op%"=="n" goto CHANGESET
 
 :COMPRESS
+:: video filter "pixel format, frame mix=count=frame weighting"
 if %UseMB%==1 ( set mbops=-filter:v ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
 set codec=libx264
 set extension=mp4
+set audcom=-b:a %abr%K
+if %srcaud%==1 ( set audcom=-c:a copy )
 if %UseWebm%==1 (
 	set codec=vp9
 	set extension=webm
+	:: webm has an issue with certain audio codecs, best to just remux
+	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
-:: ffmpeg -input filename -bitrate:video mbr -bitrate:audio abr -codec:video codec outputname
-ffmpeg -i "%~f1" -b:v %mbr%K -b:a %abr%K %mbops% -c:v %codec% "%name%_qc.%extension%"
+:: ffmpeg -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (mbops) -codec:video codec outputname
+ffmpeg -i "%~f1" -b:v %mbr%K %audcom% %mbops% -c:v %codec% "%name%_qc.%extension%"
 exit
 
 :SMARTMBRCALC
@@ -96,7 +103,7 @@ if %UseWebm%==1 (
 	set /a buffer=mbr / 3
 ) else (
 	if %UseNVENC%==1 (
-		set /a buffer=mbr / 6
+		set /a buffer=mbr / 8
 	) else ( set /a buffer=mbr / 12 )
 )
 set /a mbr=mbr - abr - buffer
@@ -134,6 +141,7 @@ set /p abr=
 goto COMPRESS
 
 :FINDSRCABR
+set srcaud=1
 :: get source bitrate from the provided file by sending it to a temporary file. Thanks batch
 :: go go gadget copy paste again - https://superuser.com/questions/1541235/how-can-i-get-the-audio-bitrate-from-a-video-file-using-ffprobe
 ffprobe -v 0 -select_streams a:0 -show_entries stream=bit_rate -of compact=p=0:nk=1 "%~f1" > quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
