@@ -31,7 +31,7 @@ set abr=src
 :: Use webm (vp9) instead of mp4 (x264) (default: 0)
 :: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
 :: Has a higher priority than NVENC, if both are enabled.
-set UseWebm=1
+set UseWebm=0
 
 :: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
