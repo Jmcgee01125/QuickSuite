@@ -16,6 +16,9 @@ To use, drag the video file onto QuickCompress.bat.
 
 The output will be saved as <source file>_qc.<type selection>
 
+If the output file is greater than the target, don't worry. Just open QuickCompress.bat (right click > edit) and change TargetOutputSizeKB lower.
+	For example, an encoding of 8.36 MB with a target of 8000 would probably work if the target is 7000.
+
 :: -------------------------------------
 
 By opening QuickCompress.bat, seven variables become available:
