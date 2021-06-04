@@ -209,5 +209,6 @@ goto COMPRESS
 :ERROR_file
 echo Error: please drag a file onto this program to use it.
 echo If you meant to edit this file to change settings, right click it then select edit.
+echo.
 pause
 exit
