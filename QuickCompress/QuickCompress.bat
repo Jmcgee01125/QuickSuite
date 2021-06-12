@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.4c
+:: QuickCompress Version 1.4d
 
 :: -------------------------------------
 
@@ -73,7 +73,7 @@ if /I "%op%"=="n" goto CHANGESET
 
 :COMPRESS
 :: video filter "pixel format, frame mix=count=frame weighting"
-if %UseMB%==1 ( set mbops=-filter:v ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
+if %UseMB%==1 ( set mbops=-filter_complex ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
 set codec=libx264
 set extension=mp4
 set audcom=-b:a %abr%K
