@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.4d
+:: QuickCompress Version 1.5
 
 :: -------------------------------------
 
@@ -38,6 +38,9 @@ set UseWebm=0
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
 
+:: Number of times to attempt recompressing if file size exceeds target size (default: 3)
+set FailureThreshold=3
+
 :: Enables a motion blur effect created by blending frames around the current frame (defaults: 0, 2)
 set UseMB=0
 set MBFrames=2
@@ -53,6 +56,10 @@ if [%1]==[] goto ERROR_file
 
 :: get the name of the file for the output to match
 set name=%~n1%
+
+:: set up encoding failure variables
+set failcount=0
+set OrigTargetOutputSizeKB=%TargetOutputSizeKB%
 
 :: if using same audio bitrate, detect it
 set srcaud=0
@@ -85,7 +92,15 @@ if %UseWebm%==1 (
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
 :: ffmpeg -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (mbops) -codec:video codec outputname
-ffmpeg -i "%~f1" -b:v %mbr%K %audcom% %mbops% -c:v %codec% "%name%_qc.%extension%"
+ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %mbops% -c:v %codec% "%name%_qc.%extension%"
+if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
+exit
+
+:CHECKOUTPUTSIZE
+:: go go gadget copy paste - https://stackoverflow.com/questions/1199645/how-can-i-check-the-size-of-a-file-in-a-windows-batch-script
+for /f "tokens=*" %%A in ("%name%_qc.%extension%") do set bsize=%%~zA
+set /a kbsize=bsize / 1024
+if %kbsize% GTR %OrigTargetOutputSizeKB% goto ERR_largeoutput
 exit
 
 :SMARTMBRCALC
@@ -194,6 +209,25 @@ echo (a/v/C):
 set /p sel=
 if /I "%sel%"=="a" goto ERR_btlcustomaudio
 if /I "%sel%"=="v" goto ERR_btlcustomvideo
+exit
+
+:: output size exceeded, so retry encoding until we hit max failures
+:ERR_largeoutput
+set /a failcount=failcount + 1
+if %failcount% EQU %FailureThreshold% goto ERR_largeoutcancel
+cls
+echo Failed to encode: target output size exceeded.
+echo Attempting to encode at a lower threshold...
+:: reduce the target size by half the amount we were over the threshold
+set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize) / 2 + TargetOutputSizeKB
+echo New target: %TargetOutputSizeKB%
+goto :SMARTMBRCALC
+
+:ERR_largeoutcancel
+cls
+echo Could not encode to target size within allotted attempts. Job cancelled.
+echo Increasing the FailureThreshold variable could allow this job to pass.
+pause
 exit
 
 :ERR_btlcustomaudio

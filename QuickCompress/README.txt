@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.4d
+QuickCompress Version 1.5
 
 :: -------------------------------------
 
@@ -16,12 +16,15 @@ To use, drag the video file onto QuickCompress.bat.
 
 The output will be saved as <source file>_qc.<type selection>
 
-If the output file is greater than the target, don't worry. Just open QuickCompress.bat (right click > edit) and change TargetOutputSizeKB lower.
-	For example, an encoding of 8.36 MB with a target of 8000 would probably work if the target is 7000.
+If the output is larger than the target, the program will attempt to re-encode with a more restrictive target
+	It will iterate this process multiple times, up to the value of the FailureThreshold variable
+	Some videos may still fail, in this case the program will display an error
+		Changing FailureThreshold to allow more attempts may solve the issue
+		However, manually changing the target size is recommended if this happens
 
 :: -------------------------------------
 
-By opening QuickCompress.bat, ten variables become available:
+By opening QuickCompress.bat, eleven variables become available:
 	UseSmartBitrate - Automatically determines the bitrate to obtain a given file size (default: 1).
 	TargetOutputSizeKB - The size, in KB (not Kb), of the output file. 8000 = 8 MB, the Discord file limit (default: 8000).
 	WarnForLowDetailThresholdMP4 - If the bitrate is below this number when using mp4, warn the user. Prevents terrible quality output (default: 512).
@@ -33,6 +36,7 @@ By opening QuickCompress.bat, ten variables become available:
 		Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
 	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 1).
 		QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
+	FailureThreshold - Number of times the program will attempt more restrictive bitrates before displaying a failure to hit size target (default: 3).
 	UseMB - Applies a frameblended motionblur effect to the final output (default: 0).
 	MBFrames - If using motionblur, specifies the number of frames to blend (default: 2).
 	
