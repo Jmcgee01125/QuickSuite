@@ -11,7 +11,7 @@ QuickConv is a fast and easy way to convert files from a series of images (0001.
 
 To use, leave QuickConv.bat and QuickConv_op.txt in the same folder as your images, then run QuickConv.bat.
 	Make sure no other images follow the same naming structure or the program may behave unexpectedly.
-	Missing QuickConv_op.txt allows setting defaults, but it is not required for the program to work.
+	QuickConv_op.txt is responsible for setting user defaults, but it is not required for the program to work.
 
 Images must have a static filename length, so 1..100 is not allowed but 001..100 is.
 
