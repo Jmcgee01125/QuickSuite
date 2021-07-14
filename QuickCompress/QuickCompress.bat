@@ -2,21 +2,21 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.5
+:: QuickCompress Version 1.5b
 
 :: -------------------------------------
 
-:: USAGE: Simply drag and drop the file you want to convert on top of this .bat
+:: USAGE: Simply drag and drop the file you want to compress on top of this .bat
 
 :: -------------------------------------
 
 :: Settings
 
-:: Automatically determines maximum bitrate based on the target output size in KB (defaults: 1, 8000, 1024, 256)
+:: Automatically determines maximum bitrate based on the target output size in Kb (defaults: 1, 8192, 1024, 256)
 :: Note that there are some scenarios where the file still exceeds the target. In this case, try reducing target output size.
 :: To disable, set UseSmartBitrate to 0
 set UseSmartBitrate=1
-set TargetOutputSizeKB=8000
+set TargetOutputSizeKB=8192
 set WarnForLowDetailThresholdMP4=1024
 set WarnForLowDetailThresholdWebm=256
 
@@ -227,6 +227,8 @@ goto :SMARTMBRCALC
 cls
 echo Could not encode to target size within allotted attempts. Job cancelled.
 echo Increasing the FailureThreshold variable could allow this job to pass.
+echo Final pass was %kbsize% Kb with a target of %OrigTargetOutputSizeKB%
+echo.
 pause
 exit
 
