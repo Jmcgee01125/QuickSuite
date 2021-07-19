@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickConv Version 1.6
+:: QuickConv Version 1.6b
 
 :: -------------------------------------
 
@@ -41,38 +41,37 @@ if exist "%opsfile%" (
 :CONVERSION
 echo.
 echo Please choose an output file format:
-echo 1 - avi  (raw)      - perfect quality
-echo 2 - avi  (huffyuv)  - near-perfect quality
-echo 3 - webm (vp9)      - good compression, slow
-echo 4 - mp4  (cpu x264) - small file size
-echo 5 - mp4  (gpu h264) - small file size, fastest, requires nvenc-enabled GPU
+echo 1 - avi  (raw)        - perfect quality, very large file size
+echo 2 - avi  (huffyuv)    - near-perfect quality
+echo 3 - webm (vp9)        - good compression, slow
+echo 4 - mp4  (cpu x264)   - small file size
+echo 5 - mp4  (gpu nvenc)  - small file size, fastest, requires nvenc-enabled GPU
 echo 6 - CANCEL OPERATION
-echo Selection (default 4): 
-set /p sel=
-
-if "%sel%"=="1" (
-	set bitrate=
-	set codec=rawvideo
-	set outtype=avi
-) else if "%sel%"=="2" (
-	set bitrate=
-	set codec=huffyuv
-	set outtype=avi
-) else if "%sel%"=="3" (
-	set bitrate=-b:v %mbr%
-	set codec=vp9
-	set outtype=webm
-) else if "%sel%"=="5" (
+choice /c 123456 /m "Make a selection"
+:: for some insane reason ==3 means >=3 when comparing errorlevel, so we have to reverse this
+if %errorlevel%==6 (
+	exit
+) else if %errorlevel%==5 (
 	set bitrate=-b:v %mbr%
 	set codec=h264_nvenc
 	set outtype=mp4
-) else if "%sel%"=="6" (
-	exit
-) else (
+) else if %errorlevel%==4 (
 	set bitrate=-b:v %mbr%
 	set codec=libx264
 	set outtype=mp4
-)
+) else if %errorlevel%==3 (
+	set bitrate=-b:v %mbr%
+	set codec=vp9
+	set outtype=webm
+) else if %errorlevel%==2 (
+	set bitrate=
+	set codec=huffyuv
+	set outtype=avi
+) else if %errorlevel%==1 (
+	set bitrate=
+	set codec=rawvideo
+	set outtype=avi
+) 
 :: ffmpeg -framerate fps -logsize -input filenamerangefromhell -input audiofile -videofilters format=colorspace motionblur=settings -r newfps -videobitrate -videocodec outputfile
 ffmpeg -framerate %fps% -thread_queue_size 128K -i "%pre%%%0%num%d%end%.%filetype%" %aud% -filter:v "format=yuv420p%mbops%" %mbf% %bitrate% -c:v %codec% -b:a %abr% -shortest output.%outtype%
 exit
@@ -111,9 +110,8 @@ echo MB_FPBlur: %mfp%
 if NOT [%aud%]==[] (
 	set aud=-i %aud%
 )
-echo Would you like to use these settings? (Y/n):
-set /p op=
-if /I "%op%"=="n" (
+choice /c YN /m "Would you like to use these settings"
+if %errorlevel%==2 (
 	echo.
 	GOTO GETVARSFROMINPUT
 )
@@ -145,16 +143,15 @@ set /p aud=
 if NOT [%aud%]==[] (
 	set aud=-i %aud%
 )
-echo Enable motion blur (y/N):
-set /p mob=
-if /I "%mob%"=="y" (
-	echo Enter output framerate (can be equal to source framerate):
-	set /p mbf=
-	echo Enter frames per motion blur frame:
-	set /p mfp=
-	GOTO CALCULATEMOTIONBLUR
+choice /c YN /m "Enable motion blur"
+if %errorlevel%==2 (
+	set mbf=
+	set mfp=
+	GOTO CONVERSION
 )
-:: else not general
-set mbf=
-set mfp=
-GOTO CONVERSION
+:: else do motion blur
+echo Enter output framerate (can be equal to source framerate):
+set /p mbf=
+echo Enter frames per motion blur frame:
+set /p mfp=
+GOTO CALCULATEMOTIONBLUR

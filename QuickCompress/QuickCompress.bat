@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.5b
+:: QuickCompress Version 1.5c
 
 :: -------------------------------------
 
@@ -74,9 +74,8 @@ if %UseSmartBitrate%==1 goto SMARTMBRCALC
 :: not using smart bitrate, so confirm that the settings are to the user's liking
 echo Using video bitrate %mbr%K
 echo Using audio bitrate %abr%K
-echo Would you like to use these settings? (Y/n):
-set /p op=
-if /I "%op%"=="n" goto CHANGESET
+choice /c YN /m "Would you like to use these settings"
+if %errorlevel%==2 goto CHANGESET
 
 :COMPRESS
 :: video filter "pixel format, frame mix=count=frame weighting"
@@ -133,19 +132,17 @@ goto COMPRESS
 :: also used for nvenc
 echo Warning: MP4 video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdMP4% Kbps).
 echo This will drastically affect the video quality.
-echo Do you wish to continue with mp4 (m), switch to webm (w), or cancel (c)? (m/W/c):
-set /p cont=
-if /I "%cont%"=="m" goto COMPRESS
-if /I "%cont%"=="c" exit
+choice /c WMC /m "Do you wish to switch to webm (w), continue with mp4 (m), or cancel (c)"
+if %errorlevel%==3 exit
+if %errorlevel%==2 goto COMPRESS
 set UseWebm=1
 goto SMARTMBRCALC
 
 :CONFIRMLOWDETAILWEBM
 echo Warning: Webm video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdWebm% Kbps).
 echo This will drastically affect the video quality.
-echo Do you wish to continue? (Y/n):
-set /p cont=
-if /I "%cont%"=="n" exit
+choice /c YN /m "Do you wish to continue"
+if %errorlevel%==2 exit
 goto COMPRESS
 
 :CHANGESET
@@ -190,13 +187,14 @@ echo a - Set a custom audio bitrate (currently %abr%)
 echo v - Use static video bitrate (may exceed target size)
 echo m - Switch to mp4
 echo c - Cancel
-echo (a/v/M/c):
-set /p sel=
-if /I "%sel%"=="a" goto ERR_btlcustomaudio
-if /I "%sel%"=="v" goto ERR_btlcustomvideo
-if /I "%sel%"=="c" exit
-set UseWebm=0
-GOTO SMARTMBRCALC
+choice /c AVMC /m "Make a selection"
+if %errorlevel%==4 exit
+if %errorlevel%==3 (
+	set UseWebm=0
+	GOTO SMARTMBRCALC
+)
+if %errorlevel%==2 goto ERR_btlcustomvideo
+goto ERR_btlcustomaudio
 
 :: currently assumes that mp4 is always smaller than webm. This is generally true, but in some circumstances it isn't
 :: nvenc is disabled at this stage due to buffer sizing
@@ -205,11 +203,10 @@ set UseNVENC=0
 echo a - Set a custom audio bitrate (currently %abr%)
 echo v - Use static video bitrate (may exceed target size)
 echo c - Cancel
-echo (a/v/C):
-set /p sel=
-if /I "%sel%"=="a" goto ERR_btlcustomaudio
-if /I "%sel%"=="v" goto ERR_btlcustomvideo
-exit
+choice /c AVC /m "Make a selection"
+if %errorlevel%==3 exit
+if %errorlevel%==2 goto ERR_btlcustomvideo
+goto ERR_btlcustomaudio
 
 :: output size exceeded, so retry encoding until we hit max failures
 :ERR_largeoutput
