@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.6
+:: QuickCompress Version 1.7
 
 :: -------------------------------------
 
@@ -43,10 +43,18 @@ set UseNVENC=1
 set UseMaxFPS=1
 set MaxFPS=30
 
+:: Enable changing the resolution to whatever value is set if the source is higher.
+:: Useful for when you're commonly encoding 4k videos and want it to be smaller.
+:: Very low resolutions may cause certain videos to fail. Treat this as a maximum, not a compression technique.
+:: Note that this is the video pixel HEIGHT (the 1080 in 1920x1080), the aspect ratio is always preserved. (defaults: 1, 1080)
+set UseMaxResolution=1
+set MaxResHeight=1080
+
 :: Number of times to attempt recompressing if file size exceeds target size (default: 3)
 set FailureThreshold=3
 
-:: Enables a motion blur effect created by blending frames around the current frame (defaults: 0, 2)
+:: Enables a motion blur effect created by blending frames around the current frame.
+:: THIS IS NOT COMPATIBLE WITH UseMaxResolution! Enabling both will disable motion blur. (defaults: 0, 2)
 set UseMB=0
 set MBFrames=2
 
@@ -81,9 +89,15 @@ set /p fps=<quickcomptemporaryfileforyoinkingtheoriginalfps.txt
 del quickcomptemporaryfileforyoinkingtheoriginalfps.txt
 :: ffmpeg returns a precise fraction (like 30000/1001), so we do some math
 set /a fps=%fps%
-
 :: if the source FPS is higher than the maximum allowed FPS, reduce it
 if %UseMaxFPS%==1 (if %fps% GTR %MaxFPS% set fps=%MaxFPS%)
+
+:: get the source resolution
+ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 "%~f1" > quickcomptemporaryfileforyoinkingtheoriginalresolution.txt
+set /p height=<quickcomptemporaryfileforyoinkingtheoriginalresolution.txt
+del quickcomptemporaryfileforyoinkingtheoriginalresolution.txt
+:: if the source FPS is higher than the maximum allowed FPS, reduce it
+if %UseMaxResolution%==1 ( if %height% GTR %MaxResHeight% set height=%MaxResHeight% )
 
 if %UseSmartBitrate%==1 goto SMARTMBRCALC
 :: not using smart bitrate, so confirm that the settings are to the user's liking
@@ -93,8 +107,11 @@ choice /c YN /m "Would you like to use these settings"
 if %errorlevel%==2 goto CHANGESET
 
 :COMPRESS
+:: the following two options are mutually exclusive, and max res will overwrite motion blur settings
 :: video filter "pixel format, frame mix=count=frame weighting"
-if %UseMB%==1 ( set mbops=-filter_complex ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
+if %UseMB%==1 ( set filterops=-filter_complex ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
+:: video filter "resolution = keep aspect ratio : pixel height"
+if %UseMaxResolution%==1 ( set filterops=-filter_complex "scale=-1:%height%" )
 set codec=libx264
 set extension=mp4
 set audcom=-b:a %abr%K
@@ -105,8 +122,8 @@ if %UseWebm%==1 (
 	:: webm has an issue with certain audio codecs, best to just remux
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
-:: ffmpeg -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (mbops) -codec:video codec -framerate fps outputname
-ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %mbops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
+:: ffmpeg -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
+ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
 exit
 

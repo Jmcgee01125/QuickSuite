@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.6
+QuickCompress Version 1.7
 
 :: -------------------------------------
 
@@ -11,7 +11,6 @@ QuickCompress is a quick and easy way to compress videos either below a filesize
 
 To use, drag the video file onto QuickCompress.bat.
 	If UseSmartBitrate is 1, then the program will start immediately with the specified settings. If there's a problem, the user will get prompts.
-		Once ffmpeg starts encoding, don't worry. As far as I know, no errors can occur at this point barring a crash. It will finish on its own.
 	If UseSmartBitrate is 0, then the program will prompt the user to confirm a static bitrate before continuing
 
 The output will be saved as <source file>_qc.<type selection>
@@ -38,7 +37,10 @@ By opening QuickCompress.bat, eleven variables become available:
 		QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
 	UseMaxFPS - Enables using a maximum framerate, frames beyond this will be discarded (default: 1).
 	MaxFPS - If UseMaxFPS is enabled, this is the maximum framerate. Lower framerates are kept as-is (default: 30).
+	UseMaxResolution - Enables using a maximum resolution, videos of a higher res will be shrunk (default: 1).
+	MaxResHeight - The maximum pixel height of the video, aspect ratio is always preserved (default: 1080).
 	FailureThreshold - Number of times the program will attempt more restrictive bitrates before displaying a failure to hit size target (default: 3).
 	UseMB - Applies a frameblended motionblur effect to the final output (default: 0).
+		This feature is automatically disabled during runtime if UseMaxResolution is enabled, as they are incompatible.
 	MBFrames - If using motionblur, specifies the number of frames to blend (default: 2).
 	
