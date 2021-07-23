@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.5c
+:: QuickCompress Version 1.6
 
 :: -------------------------------------
 
@@ -38,6 +38,11 @@ set UseWebm=0
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
 
+:: Have a maximum framerate on the output.
+:: Videos with a framerate lower than this value will use their original FPS (defaults: 1, 30)
+set UseMaxFPS=1
+set MaxFPS=30
+
 :: Number of times to attempt recompressing if file size exceeds target size (default: 3)
 set FailureThreshold=3
 
@@ -64,13 +69,23 @@ set OrigTargetOutputSizeKB=%TargetOutputSizeKB%
 :: if using same audio bitrate, detect it
 set srcaud=0
 if "%abr%"=="src" goto FINDSRCABR
-:RETURNINTRO
+:RETURNINTRO_ABR
 
 if %UseNVENC%==1 goto CHECKNVENC
-:RETURNINTRO_PRE
+:RETURNINTRO_NVENC
+
+:: get the source FPS
+:: go go gadget copy paste https://stackoverflow.com/questions/27792934/get-video-fps-using-ffprobe
+ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=avg_frame_rate "%~f1" > quickcomptemporaryfileforyoinkingtheoriginalfps.txt
+set /p fps=<quickcomptemporaryfileforyoinkingtheoriginalfps.txt
+del quickcomptemporaryfileforyoinkingtheoriginalfps.txt
+:: ffmpeg returns a precise fraction (like 30000/1001), so we do some math
+set /a fps=%fps%
+
+:: if the source FPS is higher than the maximum allowed FPS, reduce it
+if %UseMaxFPS%==1 (if %fps% GTR %MaxFPS% set fps=%MaxFPS%)
 
 if %UseSmartBitrate%==1 goto SMARTMBRCALC
-
 :: not using smart bitrate, so confirm that the settings are to the user's liking
 echo Using video bitrate %mbr%K
 echo Using audio bitrate %abr%K
@@ -90,8 +105,8 @@ if %UseWebm%==1 (
 	:: webm has an issue with certain audio codecs, best to just remux
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
-:: ffmpeg -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (mbops) -codec:video codec outputname
-ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %mbops% -c:v %codec% "%name%_qc.%extension%"
+:: ffmpeg -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (mbops) -codec:video codec -framerate fps outputname
+ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %mbops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
 exit
 
@@ -160,7 +175,7 @@ ffprobe -v 0 -select_streams a:0 -show_entries stream=bit_rate -of compact=p=0:n
 set /p abr=<quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
 del quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
 set /a abr=abr / 1000
-goto RETURNINTRO
+goto RETURNINTRO_ABR
 
 :CHECKNVENC
 :: print status message due to potential lag if it's a really slow cpu
@@ -172,7 +187,7 @@ for /f "delims=" %%a in ('ffmpeg -buildconf') do (
 )
 :: no you can't have nvenc you have baby gpu
 if %found%==0 set UseNVENC=0
-goto RETURNINTRO_PRE
+goto RETURNINTRO_NVENC
 
 :: if the bitrate is below zero then ffmpeg crashes, so it should be handled
 :ERROR_bitratetoolow
@@ -215,8 +230,8 @@ if %failcount% EQU %FailureThreshold% goto ERR_largeoutcancel
 cls
 echo Failed to encode: target output size exceeded.
 echo Attempting to encode at a lower threshold...
-:: reduce the target size by half the amount we were over the threshold
-set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize) / 2 + TargetOutputSizeKB
+:: reduce the target size by half the amount we were over the threshold, plus a bit more
+set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize - 50) / 2 + TargetOutputSizeKB
 echo New target: %TargetOutputSizeKB%
 goto :SMARTMBRCALC
 
@@ -224,7 +239,7 @@ goto :SMARTMBRCALC
 cls
 echo Could not encode to target size within allotted attempts. Job cancelled.
 echo Increasing the FailureThreshold variable could allow this job to pass.
-echo Final pass was %kbsize% Kb with a target of %OrigTargetOutputSizeKB%
+echo Final pass was %kbsize% Kb with a target of %OrigTargetOutputSizeKB% (encoding target: %TargetOutputSizeKB%)
 echo.
 pause
 exit
