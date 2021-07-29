@@ -23,7 +23,7 @@ If the output is larger than the target, the program will attempt to re-encode w
 
 :: -------------------------------------
 
-By opening QuickCompress.bat, eleven variables become available:
+By opening QuickCompress.bat, fifteen variables become available:
 	UseSmartBitrate - Automatically determines the bitrate to obtain a given file size (default: 1).
 	TargetOutputSizeKB - The size, in Kb (not KB), of the output file. 8192 Kb = 8 MB, the Discord file limit (default: 8192).
 	WarnForLowDetailThresholdMP4 - If the bitrate is below this number when using mp4, warn the user. Prevents terrible quality output (default: 512).
