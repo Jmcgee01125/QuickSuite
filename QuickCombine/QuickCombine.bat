@@ -61,6 +61,7 @@ for /l %%N in (1,1,%argnum%) do (
 
 :COMBINE
 :: If using NVENC, specify it. Otherwise, will let ffmpeg decide
+set codec=
 if %UseNVENC%==1 set codec=-c:v h264_nvenc
 :: go go gadget how does ffmpeg work https://blog.feurious.com/concatenate-videos-together-using-ffmpeg
 :: ffmpeg -i file1 -i file2 <continues per file> -filter_complex "[0:v][0:a][1:v][1:a]<continues per file> concat=n=<filecount>:v=1:a=1 [outv] [outa]" -map "[outv]" -map "[outa]" -c:v <encoding codec> <filename>.<extension>
