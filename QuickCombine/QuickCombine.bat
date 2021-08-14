@@ -7,7 +7,7 @@
 :: -------------------------------------
 
 :: USAGE: Select all the files you want to combine, and drag them on top of this .bat
-::		  You are responsible for making sure that all items are videos.
+::        You are responsible for making sure that all items are videos.
 
 :: -------------------------------------
 
@@ -30,7 +30,6 @@ title QuickCombine
 
 :: if the user didn't give a file, show an error
 if [%1]==[] goto ERROR_file
-
 
 if %UseNVENC%==1 goto CHECKNVENC
 :RETURNINTRO_NVENC

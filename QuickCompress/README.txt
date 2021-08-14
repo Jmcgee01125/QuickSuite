@@ -31,16 +31,15 @@ By opening QuickCompress.bat, fifteen variables become available:
 	mbr - Maximum bitrate used when UseSmartBitrate is disabled (default: 2000).
 	abr - Audio bitrate used, enter "src" to preserve the original audio bitrate (default: src).
 	UseWebm - Uses webm/VP9 instead of mp4/x264 by default. Takes longer to encode, but has superior compression at low bitrates (default: 0).
-		  Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
-		  Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
+	          Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
+	          Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
 	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 1).
-		   QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
+	           QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
 	UseMaxFPS - Enables using a maximum framerate, frames beyond this will be discarded (default: 1).
 	MaxFPS - If UseMaxFPS is enabled, this is the maximum framerate. Lower framerates are kept as-is (default: 30).
 	UseMaxResolution - Enables using a maximum resolution, videos of a higher res will be shrunk (default: 1).
 	MaxResHeight - The maximum pixel height of the video, aspect ratio is always preserved (default: 1080).
 	FailureThreshold - Number of times the program will attempt more restrictive bitrates before displaying a failure to hit size target (default: 3).
 	UseMB - Applies a frameblended motionblur effect to the final output (default: 0).
-		This feature is automatically disabled during runtime if UseMaxResolution is enabled, as they are incompatible.
+	        This feature is automatically disabled during runtime if UseMaxResolution is enabled, as they are incompatible.
 	MBFrames - If using motionblur, specifies the number of frames to blend (default: 2).
-	
