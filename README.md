@@ -6,6 +6,8 @@ A collection of batch tools to do various tasks quickly, with a special focus on
 CURRENT TOOLS 
 :: ------------------------------------- ::
 
+QuickCombine: concatenate videos using a user-defined order.
+
 QuickCompress: automatically compresses a video below a certain size, which is useful for sending videos on size-restricted platforms like Discord.
 
 QuickConv: converts a series of images (0001.png, 0002.png, etc) into a video file, with support for audio and frameblend motionblur.
