@@ -70,7 +70,7 @@ if %h2% GEQ 1 (
 if %m2% GEQ 1 (
 	echo Enter starting minute, or nothing to default to 0:
 	set /p m1=
-	echo Enter ending hour, or nothing to default to the end of the video:
+	echo Enter ending minute, or nothing to default to the end of the video:
 	set /p m2=
 )
 echo Enter starting second, or nothing to default to 0:

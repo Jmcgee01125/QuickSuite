@@ -162,7 +162,7 @@ goto COMPRESS
 
 :CONFIRMLOWDETAIL
 :: also used for nvenc
-echo Warning: MP4 video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdMP4% Kbps).
+echo Warning: MP4 video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdMP4% Kbps).
 echo This will drastically affect the video quality.
 choice /c WMC /m "Do you wish to switch to webm (w), continue with mp4 (m), or cancel (c)"
 if %errorlevel%==3 exit
@@ -171,7 +171,7 @@ set UseWebm=1
 goto SMARTMBRCALC
 
 :CONFIRMLOWDETAILWEBM
-echo Warning: Webm video bitrate is very low (%mbr% ^< %WarnForLowDetailThresholdWebm% Kbps).
+echo Warning: Webm video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdWebm% Kbps).
 echo This will drastically affect the video quality.
 choice /c YN /m "Do you wish to continue"
 if %errorlevel%==2 exit
