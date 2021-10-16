@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.7
+:: QuickCompress Version 1.8
 
 :: -------------------------------------
 
@@ -70,6 +70,10 @@ if [%1]==[] goto ERROR_file
 :: get the name of the file for the output to match
 set name=%~n1%
 
+:: if the original file size is below the target, why encode?
+if %UseSmartBitrate%==1 goto CONFIRMORIGINALSIZE
+:RETURNINTRO_COS
+
 :: set up encoding failure variables
 set failcount=0
 set OrigTargetOutputSizeKB=%TargetOutputSizeKB%
@@ -132,6 +136,17 @@ exit
 for /f "tokens=*" %%A in ("%name%_qc.%extension%") do set bsize=%%~zA
 set /a kbsize=bsize / 1024
 if %kbsize% GTR %OrigTargetOutputSizeKB% goto ERR_largeoutput
+exit
+
+:CONFIRMORIGINALSIZE
+:: if the filesize is already below the target, don't encode
+for /f "tokens=*" %%A in (%1) do set bsize=%%~zA
+set /a kbsize=bsize / 1024
+if %kbsize% GTR %TargetOutputSizeKB% goto RETURNINTRO_COS
+echo Original file is already below the target output size of %TargetOutputSizeKB% KB
+echo If you meant to re-encode this video, right click QuickCompress, select edit, and turn off UseSmartBitrate.
+echo.
+pause
 exit
 
 :SMARTMBRCALC
