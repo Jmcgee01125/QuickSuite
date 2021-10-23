@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCombine Version 1.0
+:: QuickCombine Version 1.1
 
 :: -------------------------------------
 
@@ -13,10 +13,10 @@
 
 :: Settings
 
-:: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
+:: Use nvenc (GPU mp4/h264) instead of CPU (default: 0)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
-set UseNVENC=1
+set UseNVENC=0
 
 :: The video extension to use (default: mp4)
 :: If you set this to anything else, you MUST disable UseNVENC.
