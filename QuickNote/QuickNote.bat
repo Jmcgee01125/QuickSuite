@@ -27,7 +27,9 @@ title QuickNote
 
 if not exist "%template%" (
 	echo Template file could not be found. Did you open this program to set it up?
+	echo.
 	pause
+	exit
 )
 
 :: create timestamp in the form MM-DD-YYYY_HHhMMmSSs
