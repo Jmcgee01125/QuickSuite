@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.9
+QuickCompress Version 1.10
 
 :: -------------------------------------
 
@@ -12,6 +12,8 @@ QuickCompress is a quick and easy way to compress videos either below a filesize
 To use, drag the video file onto QuickCompress.bat.
 	If UseSmartBitrate is 1, then the program will start immediately with the specified settings. If there's a problem, the user will get prompts.
 	If UseSmartBitrate is 0, then the program will prompt the user to confirm a static bitrate before continuing.
+
+You may also drag multiple videos onto QuickCompress at a time, and each video will be encoded separately.
 
 The output will be saved as <source file>_qc.<type selection>
 

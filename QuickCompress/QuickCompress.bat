@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.9
+:: QuickCompress Version 1.10
 
 :: -------------------------------------
 
@@ -67,8 +67,16 @@ set MBFrames=2
 
 title QuickCompress
 
+:: create a unique (enough) process ID to use as names for temp files
+:: throw a random into NUL for weird batch reasons preventing randomness across the first values of different threads
+echo %random%>NUL
+set id=%random%%random%
+
 :: if the user didn't give a file, show an error
 if [%1]==[] goto ERROR_file
+
+:: if there are multiple files, call quickcompress copies to compress those in parallel, then kill this one
+if [%2] NEQ [] goto BECOMEMASTER
 
 :: get the name of the file for the output to match
 set name=%~n1%
@@ -90,18 +98,18 @@ if %UseNVENC%==1 goto CHECKNVENC
 
 :: get the source FPS
 :: go go gadget copy paste https://stackoverflow.com/questions/27792934/get-video-fps-using-ffprobe
-ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=avg_frame_rate "%~f1" > quickcomptemporaryfileforyoinkingtheoriginalfps.txt
-set /p fps=<quickcomptemporaryfileforyoinkingtheoriginalfps.txt
-del quickcomptemporaryfileforyoinkingtheoriginalfps.txt
+ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=avg_frame_rate "%~f1" > qcfpstemp%id%.txt
+set /p fps=<qcfpstemp%id%.txt
+del qcfpstemp%id%.txt
 :: ffmpeg returns a precise fraction (like 30000/1001), so we do some math
 set /a fps=%fps%
 :: if the source FPS is higher than the maximum allowed FPS, reduce it
 if %UseMaxFPS%==1 (if %fps% GTR %MaxFPS% set fps=%MaxFPS%)
 
 :: get the source resolution
-ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 "%~f1" > quickcomptemporaryfileforyoinkingtheoriginalresolution.txt
-set /p height=<quickcomptemporaryfileforyoinkingtheoriginalresolution.txt
-del quickcomptemporaryfileforyoinkingtheoriginalresolution.txt
+ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 "%~f1" > qcrestemp%id%.txt
+set /p height=<qcrestemp%id%.txt
+del qcrestemp%id%.txt
 :: if the source FPS is higher than the maximum allowed FPS, reduce it
 if %UseMaxResolution%==1 ( if %height% GTR %MaxResHeight% set height=%MaxResHeight% )
 
@@ -205,9 +213,9 @@ goto COMPRESS
 set srcaud=1
 :: get source bitrate from the provided file by sending it to a temporary file. Thanks batch
 :: go go gadget copy paste again - https://superuser.com/questions/1541235/how-can-i-get-the-audio-bitrate-from-a-video-file-using-ffprobe
-ffprobe -v 0 -select_streams a:0 -show_entries stream=bit_rate -of compact=p=0:nk=1 "%~f1" > quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
-set /p abr=<quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
-del quickcomptemporaryfileforyoinkingtheoriginalaudiobitrate.txt
+ffprobe -v 0 -select_streams a:0 -show_entries stream=bit_rate -of compact=p=0:nk=1 "%~f1" > qcabrtemp%id%.txt
+set /p abr=<qcabrtemp%id%.txt
+del qcabrtemp%id%.txt
 set /a abr=abr / 1000
 goto RETURNINTRO_ABR
 
@@ -223,7 +231,21 @@ for /f "delims=" %%a in ('ffmpeg -buildconf') do (
 if %found%==0 set UseNVENC=0
 goto RETURNINTRO_NVENC
 
-:: if the bitrate is below zero then ffmpeg crashes, so it should be handled
+:: if multiple arguments were passed, make quickcompress threads for them
+:: note that these threads MUST be closed with exit to kill their console, do not just let the batch file end
+:BECOMEMASTER
+echo Multiple arguments detected!
+echo Creating a separate job for each video...
+setlocal enabledelayedexpansion
+for %%a in (%*) do (
+	:: delay because otherwise their random IDs will be the same and they will read each other's temp files
+	timeout /t 1 /nobreak >NUL
+	start QuickCompress.bat %%a
+)
+:: kill this thread since we just made a new one to run on %1
+exit
+
+:: if the bitrate is below zero then ffmpeg crashes (very surprising!), so it should be handled
 :ERROR_bitratetoolow
 echo The calculated bitrate necessary to get the video under the target size is less than 0 (%mbr%).
 echo It is impossible to compress at this bitrate (because there would be no video, of course).
@@ -260,7 +282,7 @@ goto ERR_btlcustomaudio
 :: output size exceeded, so retry encoding until we hit max failures
 :ERR_largeoutput
 set /a MaxAttempts=MaxAttempts - 1
-if %NaxAttempts% EQU 0 goto ERR_largeoutcancel
+if %MaxAttempts% EQU 0 goto ERR_largeoutcancel
 cls
 echo Failed to encode: target output size exceeded.
 echo Attempting to encode at a lower threshold...
