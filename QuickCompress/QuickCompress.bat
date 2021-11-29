@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.8
+:: QuickCompress Version 1.9
 
 :: -------------------------------------
 
@@ -12,13 +12,31 @@
 
 :: Settings
 
-:: Automatically determines maximum bitrate based on the target output size in Kb (defaults: 1, 8192, 1024, 256)
-:: Note that there are some scenarios where the file still exceeds the target. In this case, try reducing target output size.
+:: Automatically determines maximum bitrate based on the target output size in Kb (defaults: 1, 8192, 8192, 3, 1024, 256)
+:: MaxOutputSizeKB is the maximum allowed size of the output.
+:: MaxOutputSizeKB should ALWAYS be greater than or equal to TargetOutputSizeKB.
+:: TargetOutputSizeKB is the initial encoding target, usually the same as MaxOutputSizeKB.
+::     If the encoded video is over MaxOutputSizeKB, then TargetOutputSize is decreased and encoding is reattempted.
+:: MaxAttempts is the number of times to attempt recompressing if the file exceeds the target size.
 :: To disable, set UseSmartBitrate to 0
 set UseSmartBitrate=1
+set MaxOutputSizeKB=8192
 set TargetOutputSizeKB=8192
+set MaxAttempts=3
 set WarnForLowDetailThresholdMP4=1024
 set WarnForLowDetailThresholdWebm=256
+
+:: Have a maximum framerate on the output.
+:: Videos with a framerate lower than this value will use their original FPS (defaults: 1, 30)
+set UseMaxFPS=1
+set MaxFPS=30
+
+:: Enable changing the resolution to whatever value is set if the source is higher.
+:: Useful for when you're commonly encoding 4k videos and want it to be smaller.
+:: Very low resolutions may cause certain videos to fail. Treat this as a maximum, not a compression technique.
+:: Note that this is the video pixel HEIGHT (the 1080 in 1920x1080), the aspect ratio is always preserved. (defaults: 1, 1080)
+set UseMaxResolution=1
+set MaxResHeight=1080
 
 :: Default maximum bitrate (in Kb), if not using smart bitrate (default: 2000)
 set mbr=2000
@@ -37,21 +55,6 @@ set UseWebm=0
 :: Can be faster than a CPU encode, but might not be supported on all systems.
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
-
-:: Have a maximum framerate on the output.
-:: Videos with a framerate lower than this value will use their original FPS (defaults: 1, 30)
-set UseMaxFPS=1
-set MaxFPS=30
-
-:: Enable changing the resolution to whatever value is set if the source is higher.
-:: Useful for when you're commonly encoding 4k videos and want it to be smaller.
-:: Very low resolutions may cause certain videos to fail. Treat this as a maximum, not a compression technique.
-:: Note that this is the video pixel HEIGHT (the 1080 in 1920x1080), the aspect ratio is always preserved. (defaults: 1, 1080)
-set UseMaxResolution=1
-set MaxResHeight=1080
-
-:: Number of times to attempt recompressing if file size exceeds target size (default: 3)
-set FailureThreshold=3
 
 :: Enables a motion blur effect created by blending frames around the current frame.
 :: THIS IS NOT COMPATIBLE WITH UseMaxResolution! Enabling both will disable motion blur. (defaults: 0, 2)
@@ -74,9 +77,8 @@ set name=%~n1%
 if %UseSmartBitrate%==1 goto CONFIRMORIGINALSIZE
 :RETURNINTRO_COS
 
-:: set up encoding failure variables
+:: set up encoding failure variable
 set failcount=0
-set OrigTargetOutputSizeKB=%TargetOutputSizeKB%
 
 :: if using same audio bitrate, detect it
 set srcaud=0
@@ -115,7 +117,7 @@ if %errorlevel%==2 goto CHANGESET
 :: video filter "pixel format, frame mix=count=frame weighting"
 if %UseMB%==1 ( set filterops=-filter_complex ^"format=yuv420p, tmix=frames=%MBFrames%:weights=^'1^'^" )
 :: video filter "resolution = keep aspect ratio : pixel height"
-if %UseMaxResolution%==1 ( set filterops=-filter_complex "scale=-1:%height%" )
+if %UseMaxResolution%==1 ( set filterops=-filter_complex ^"scale=-1:%height%^" )
 set codec=libx264
 set extension=mp4
 set audcom=-b:a %abr%K
@@ -135,15 +137,15 @@ exit
 :: go go gadget copy paste - https://stackoverflow.com/questions/1199645/how-can-i-check-the-size-of-a-file-in-a-windows-batch-script
 for /f "tokens=*" %%A in ("%name%_qc.%extension%") do set bsize=%%~zA
 set /a kbsize=bsize / 1024
-if %kbsize% GTR %OrigTargetOutputSizeKB% goto ERR_largeoutput
+if %kbsize% GTR %MaxOutputSizeKB% goto ERR_largeoutput
 exit
 
 :CONFIRMORIGINALSIZE
-:: if the filesize is already below the target, don't encode
-for /f "tokens=*" %%A in (%1) do set bsize=%%~zA
+:: if the filesize is already below the max, don't encode
+for /f "tokens=*" %%A in ("%1") do set bsize=%%~zA
 set /a kbsize=bsize / 1024
-if %kbsize% GTR %TargetOutputSizeKB% goto RETURNINTRO_COS
-echo Original file is already below the target output size of %TargetOutputSizeKB% KB
+if %kbsize% GTR %MaxOutputSizeKB% goto RETURNINTRO_COS
+echo Original file is already below the maximum output size of %MaxOutputSizeKB% KB
 echo If you meant to re-encode this video, right click QuickCompress, select edit, and turn off UseSmartBitrate.
 echo.
 pause
@@ -257,8 +259,8 @@ goto ERR_btlcustomaudio
 
 :: output size exceeded, so retry encoding until we hit max failures
 :ERR_largeoutput
-set /a failcount=failcount + 1
-if %failcount% EQU %FailureThreshold% goto ERR_largeoutcancel
+set /a MaxAttempts=MaxAttempts - 1
+if %NaxAttempts% EQU 0 goto ERR_largeoutcancel
 cls
 echo Failed to encode: target output size exceeded.
 echo Attempting to encode at a lower threshold...
@@ -270,8 +272,8 @@ goto :SMARTMBRCALC
 :ERR_largeoutcancel
 cls
 echo Could not encode to target size within allotted attempts. Job cancelled.
-echo Increasing the FailureThreshold variable could allow this job to pass.
-echo Final pass was %kbsize% Kb with a target of %OrigTargetOutputSizeKB% (encoding target: %TargetOutputSizeKB%)
+echo Increasing the MaxAttempts or lowering the TargetOutputSizeKB variables could allow this job to succeed.
+echo Final pass was %kbsize% KB with a maximum of %MaxOutputSizeKB% KB (last encoding target: %TargetOutputSizeKB% KB)
 echo.
 pause
 exit
