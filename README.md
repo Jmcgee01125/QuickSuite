@@ -7,10 +7,10 @@ A collection of batch tools to do various tasks quickly, with a special focus on
 ## CURRENT TOOLS 
 
 * **QuickCombine:** concatenate videos using a user-defined order.  
-* **QuickCompress:** automatically compresses a video below a certain size, which is useful for sending videos on size-restricted platforms like Discord.  
+* **QuickCompress:** automatically compresses videos below a certain size, which is useful for sending videos on size-restricted platforms like Discord.  
 * **QuickConv:** converts a series of images (0001.png, 0002.png, etc) into a video file, with support for audio and frameblend motionblur.  
 * **QuickExtract:** extracts audio from a video file.  
-* **QuickNote:** allows creating a note-taking file in an arbitrary directory from anywhere on the computer without having to save-as.  
+* **QuickNote:** creates a note-taking file in an arbitrary directory from anywhere on the computer without having to save-as.  
 * **QuickTrim:** trims a video based on user-selected timestamps, with or without re-encoding for quality or speed.  
 
 ---
