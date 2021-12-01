@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.10
+:: QuickCompress Version 1.10b
 
 :: -------------------------------------
 
@@ -12,7 +12,7 @@
 
 :: Settings
 
-:: Automatically determines maximum bitrate based on the target output size in Kb (defaults: 1, 8192, 8192, 3, 1024, 256)
+:: Automatically determines maximum bitrate based on the target output size in KB. (defaults: 1, 8192, 8192, 3, 1024, 256)
 :: MaxOutputSizeKB is the maximum allowed size of the output.
 :: MaxOutputSizeKB should ALWAYS be greater than or equal to TargetOutputSizeKB.
 :: TargetOutputSizeKB is the initial encoding target, usually the same as MaxOutputSizeKB.
@@ -27,7 +27,7 @@ set WarnForLowDetailThresholdMP4=1024
 set WarnForLowDetailThresholdWebm=256
 
 :: Have a maximum framerate on the output.
-:: Videos with a framerate lower than this value will use their original FPS (defaults: 1, 30)
+:: Videos with a framerate lower than this value will use their original FPS. (defaults: 1, 30)
 set UseMaxFPS=1
 set MaxFPS=30
 
@@ -38,7 +38,7 @@ set MaxFPS=30
 set UseMaxResolution=1
 set MaxResHeight=1080
 
-:: Default maximum bitrate (in Kb), if not using smart bitrate (default: 2000)
+:: Default maximum bitrate (in Kb), if not using smart bitrate. (default: 2000)
 set mbr=2000
 
 :: Default audio bitrate (in Kb), used with or without smart bitrate. Recommended no more than 196 for most uses.
@@ -46,12 +46,12 @@ set mbr=2000
 :: To use source rate, set as "src" (default: src)
 set abr=src
 
-:: Use webm (vp9) instead of mp4 (x264) (default: 0)
+:: Use webm (vp9) instead of mp4 (x264). (default: 0)
 :: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
 :: Has a higher priority than NVENC, if both are enabled.
 set UseWebm=0
 
-:: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
+:: Use nvenc (GPU mp4/h264) instead of CPU. (default: 1)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
@@ -67,11 +67,6 @@ set MBFrames=2
 
 title QuickCompress
 
-:: create a unique (enough) process ID to use as names for temp files
-:: throw a random into NUL for weird batch reasons preventing randomness across the first values of different threads
-echo %random%>NUL
-set id=%random%%random%
-
 :: if the user didn't give a file, show an error
 if [%1]==[] goto ERROR_file
 
@@ -79,7 +74,7 @@ if [%1]==[] goto ERROR_file
 if [%2] NEQ [] goto BECOMEMASTER
 
 :: get the name of the file for the output to match
-set name=%~n1%
+set name=%~n1
 
 :: if the original file size is below the target, why encode?
 if %UseSmartBitrate%==1 goto CONFIRMORIGINALSIZE
@@ -98,18 +93,13 @@ if %UseNVENC%==1 goto CHECKNVENC
 
 :: get the source FPS
 :: go go gadget copy paste https://stackoverflow.com/questions/27792934/get-video-fps-using-ffprobe
-ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=avg_frame_rate "%~f1" > qcfpstemp%id%.txt
-set /p fps=<qcfpstemp%id%.txt
-del qcfpstemp%id%.txt
 :: ffmpeg returns a precise fraction (like 30000/1001), so we do some math
-set /a fps=%fps%
+for /f "usebackq delims=" %%a in (`ffprobe -v error -select_streams v -of default^=noprint_wrappers^=1:nokey^=1 -show_entries stream^=avg_frame_rate "%~f1"`) do set /a fps=%%a
 :: if the source FPS is higher than the maximum allowed FPS, reduce it
 if %UseMaxFPS%==1 (if %fps% GTR %MaxFPS% set fps=%MaxFPS%)
 
 :: get the source resolution
-ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 "%~f1" > qcrestemp%id%.txt
-set /p height=<qcrestemp%id%.txt
-del qcrestemp%id%.txt
+for /f "usebackq delims=" %%a in (`ffprobe -v error -select_streams v:0 -show_entries stream^=height -of default^=noprint_wrappers^=1:nokey^=1 "%~f1"`) do set height=%%a
 :: if the source FPS is higher than the maximum allowed FPS, reduce it
 if %UseMaxResolution%==1 ( if %height% GTR %MaxResHeight% set height=%MaxResHeight% )
 
@@ -139,6 +129,7 @@ if %UseWebm%==1 (
 :: ffmpeg -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
 ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
+pause
 exit
 
 :CHECKOUTPUTSIZE
@@ -150,7 +141,7 @@ exit
 
 :CONFIRMORIGINALSIZE
 :: if the filesize is already below the max, don't encode
-for /f "tokens=*" %%A in ("%1") do set bsize=%%~zA
+set bsize=%~z1
 set /a kbsize=bsize / 1024
 if %kbsize% GTR %MaxOutputSizeKB% goto RETURNINTRO_COS
 echo Original file is already below the maximum output size of %MaxOutputSizeKB% KB
@@ -162,9 +153,7 @@ exit
 :SMARTMBRCALC
 :: get the video duration in seconds
 :: go go gadget copy paste - https://stackoverflow.com/questions/32344947/ffmpeg-batch-extracting-media-duration-and-writing-to-a-text-file
-for /f "tokens=2 delims==" %%a in ('ffprobe "%~f1" -show_entries format^=duration -v quiet -of compact') do (
-	set dur=%%a
-)
+for /f "tokens=2 delims==" %%a in ('ffprobe "%~f1" -show_entries format^=duration -v quiet -of compact') do set dur=%%a
 :: get the kilobit size from kilobytes size
 set /a targetkbit=%TargetOutputSizeKB% * 8
 :: kb/s formula to get average bitrate to use
@@ -213,9 +202,7 @@ goto COMPRESS
 set srcaud=1
 :: get source bitrate from the provided file by sending it to a temporary file. Thanks batch
 :: go go gadget copy paste again - https://superuser.com/questions/1541235/how-can-i-get-the-audio-bitrate-from-a-video-file-using-ffprobe
-ffprobe -v 0 -select_streams a:0 -show_entries stream=bit_rate -of compact=p=0:nk=1 "%~f1" > qcabrtemp%id%.txt
-set /p abr=<qcabrtemp%id%.txt
-del qcabrtemp%id%.txt
+for /f "usebackq delims=" %%a in (`ffprobe -v 0 -select_streams a:0 -show_entries stream^=bit_rate -of compact^=p^=0:nk^=1 "%~f1"`) do set abr=%%a
 set /a abr=abr / 1000
 goto RETURNINTRO_ABR
 
@@ -238,9 +225,10 @@ echo Multiple arguments detected!
 echo Creating a separate job for each video...
 setlocal enabledelayedexpansion
 for %%a in (%*) do (
-	:: delay because otherwise their random IDs will be the same and they will read each other's temp files
-	timeout /t 1 /nobreak >NUL
+	:: wait a bit between each due to an out of memory crash (even if enough memory is available -_-)
+	timeout /t 2 /nobreak >NUL
 	start QuickCompress.bat %%a
+	
 )
 :: kill this thread since we just made a new one to run on %1
 exit
