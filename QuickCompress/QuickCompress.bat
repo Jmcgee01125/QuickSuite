@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.10b
+:: QuickCompress Version 1.10c
 
 :: -------------------------------------
 
@@ -84,7 +84,7 @@ if %UseSmartBitrate%==1 goto CONFIRMORIGINALSIZE
 set failcount=0
 
 :: if using same audio bitrate, detect it
-set srcaud=0
+set isSrcAud=0
 if "%abr%"=="src" goto FINDSRCABR
 :RETURNINTRO_ABR
 
@@ -119,7 +119,7 @@ if %UseMaxResolution%==1 ( set filterops=-filter_complex ^"scale=-1:%height%^" )
 set codec=libx264
 set extension=mp4
 set audcom=-b:a %abr%K
-if %srcaud%==1 ( set audcom=-c:a copy )
+if %isSrcAud%==1 ( set audcom=-c:a copy )
 if %UseWebm%==1 (
 	set codec=vp9
 	set extension=webm
@@ -170,25 +170,8 @@ set /a mbr=mbr - abr - buffer
 
 if %mbr% LEQ 0 goto ERROR_bitratetoolow
 
-if %mbr% LEQ %WarnForLowDetailThresholdMP4% if %UseWebm%==0 goto CONFIRMLOWDETAIL
-if %mbr% LEQ %WarnForLowDetailThresholdWebm% if %UseWebm%==1 goto CONFIRMLOWDETAILWEBM
-goto COMPRESS
-
-:CONFIRMLOWDETAIL
-:: also used for nvenc
-echo Warning: MP4 video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdMP4% Kbps).
-echo This will drastically affect the video quality.
-choice /c WMC /m "Do you wish to switch to webm (w), continue with mp4 (m), or cancel (c)"
-if %errorlevel%==3 exit
-if %errorlevel%==2 goto COMPRESS
-set UseWebm=1
-goto SMARTMBRCALC
-
-:CONFIRMLOWDETAILWEBM
-echo Warning: Webm video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdWebm% Kbps).
-echo This will drastically affect the video quality.
-choice /c YN /m "Do you wish to continue"
-if %errorlevel%==2 exit
+if %mbr% LEQ %WarnForLowDetailThresholdMP4% if %UseWebm%==0 goto WARN_confirmlowdetail
+if %mbr% LEQ %WarnForLowDetailThresholdWebm% if %UseWebm%==1 goto WARN_confirmlowdetailwebm
 goto COMPRESS
 
 :CHANGESET
@@ -199,11 +182,12 @@ set /p abr=
 goto COMPRESS
 
 :FINDSRCABR
-set srcaud=1
+set isSrcAud=1
 :: get source bitrate from the provided file by sending it to a temporary file. Thanks batch
 :: go go gadget copy paste again - https://superuser.com/questions/1541235/how-can-i-get-the-audio-bitrate-from-a-video-file-using-ffprobe
 for /f "usebackq delims=" %%a in (`ffprobe -v 0 -select_streams a:0 -show_entries stream^=bit_rate -of compact^=p^=0:nk^=1 "%~f1"`) do set abr=%%a
 set /a abr=abr / 1000
+set srcabr=%abr%
 goto RETURNINTRO_ABR
 
 :CHECKNVENC
@@ -233,8 +217,30 @@ for %%a in (%*) do (
 :: kill this thread since we just made a new one to run on %1
 exit
 
+:WARN_confirmlowdetail
+:: also used for nvenc
+cls
+echo Warning: MP4 video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdMP4% Kbps).
+echo This will drastically affect the video quality.
+choice /c WMAC /m "Do you wish to switch to webm (w), continue with mp4 (m), change the audio bitrate (a), or cancel (c)"
+if %errorlevel%==4 exit
+if %errorlevel%==3 goto NEW_customaudio
+if %errorlevel%==2 goto COMPRESS
+set UseWebm=1
+goto SMARTMBRCALC
+
+:WARN_confirmlowdetailwebm
+cls
+echo Warning: Webm video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdWebm% Kbps).
+echo This will drastically affect the video quality.
+choice /c WAC /m "Do you wish to continue with webm (w), change the audio bitrate (a), or cancel (c)"
+if %errorlevel%==3 exit
+if %errorlevel%==2 goto NEW_customaudio
+goto COMPRESS
+
 :: if the bitrate is below zero then ffmpeg crashes (very surprising!), so it should be handled
 :ERROR_bitratetoolow
+cls
 echo The calculated bitrate necessary to get the video under the target size is less than 0 (%mbr%).
 echo It is impossible to compress at this bitrate (because there would be no video, of course).
 echo You can remedy this by reducing the length of your file or taking one of the actions below:
@@ -252,8 +258,8 @@ if %errorlevel%==3 (
 	set UseWebm=0
 	GOTO SMARTMBRCALC
 )
-if %errorlevel%==2 goto ERR_btlcustomvideo
-goto ERR_btlcustomaudio
+if %errorlevel%==2 goto NEW_customvideo
+goto NEW_customaudio
 
 :: currently assumes that mp4 is always smaller than webm. This is generally true, but in some circumstances it isn't
 :: nvenc is disabled at this stage due to buffer sizing
@@ -264,8 +270,8 @@ echo v - Use static video bitrate (may exceed target size)
 echo c - Cancel
 choice /c AVC /m "Make a selection"
 if %errorlevel%==3 exit
-if %errorlevel%==2 goto ERR_btlcustomvideo
-goto ERR_btlcustomaudio
+if %errorlevel%==2 goto NEW_customvideo
+goto NEW_customaudio
 
 :: output size exceeded, so retry encoding until we hit max failures
 :ERR_largeoutput
@@ -288,12 +294,13 @@ echo.
 pause
 exit
 
-:ERR_btlcustomaudio
-echo Please enter custom audio bitrate (in Kbps):
+:NEW_customaudio
+echo Please enter custom audio bitrate (in Kbps), source is %srcabr%:
 set /p abr=
+set isSrcAud=0
 goto SMARTMBRCALC
 
-:ERR_btlcustomvideo
+:NEW_customvideo
 echo Please enter a static video bitrate (in Kbps):
 set /p mbr=
 goto COMPRESS
