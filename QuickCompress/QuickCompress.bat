@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.10c
+:: QuickCompress Version 1.11
 
 :: -------------------------------------
 
@@ -51,7 +51,7 @@ set abr=src
 :: Has a higher priority than NVENC, if both are enabled.
 set UseWebm=0
 
-:: Use nvenc (GPU mp4/h264) instead of CPU. (default: 1)
+:: Use nvenc (GPU h264_nvenc) instead of CPU. (default: 1)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
 set UseNVENC=1
@@ -193,12 +193,21 @@ goto RETURNINTRO_ABR
 :CHECKNVENC
 :: print status message due to potential lag if it's a really slow cpu
 echo Checking for nvenc support...
-:: loop over the ffmpeg build config and check for an occurrance of nvenc support
+setlocal enabledelayedexpansion
 set found=0
-for /f "delims=" %%a in ('ffmpeg -buildconf') do (
-	if "%%a"=="    --enable-nvenc" (set found=1)
+:: heavily modified (read: translated) from https://gist.github.com/Brainiarc7/c6164520f082c27ae7bbea9556d4a3ba
+for /f "usebackq delims=" %%a in (`ffmpeg -hide_banner -encoders`) do (
+	:: cursed https://stackoverflow.com/questions/34077831/how-to-see-if-a-string-contains-a-substring-using-batch
+	set codec=%%a
+	set codecsubstringed=x!codec:h264_nvenc=!
+	if not !codecsubstringed!==x!codec! set found=1
 )
-:: no you can't have nvenc you have baby gpu
+:: local schenanigans to extract the variable %found% to set %UseNVENC%
+(
+	endlocal
+	set "found=%found%"
+)
+:: if no nvenc, no nvenc
 if %found%==0 set UseNVENC=0
 goto RETURNINTRO_NVENC
 
