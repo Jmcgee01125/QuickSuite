@@ -44,9 +44,10 @@ Current options are the following:
 
 :: -------------------------------------
 
-By opening QuickConv.bat, three variables become available:
+By opening QuickConv.bat, four variables become available:
 	opsfile - string pointing to the settings file that will be used at runtime (default: QuickConv_op.txt).
 	mbr - Maximum bitrate (only used by the webm and mp4 outputs) (default: 20M).
+	abr - Audio bitrate (default: 196K).
 	filetype - Image source file type (default: png).
 
 :: -------------------------------------
