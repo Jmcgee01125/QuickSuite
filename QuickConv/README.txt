@@ -33,19 +33,20 @@ Make sure to change the settings in QuickConv_op.txt to your personal defaults.
 	This can be overridden during runtime.
 
 Current options are the following:
-	fps=INTEGER - determines the frames per second of the output. Refers to source fps if motion blur is enabled.
-	num=INTEGER - the number of digits in the input images (for example, 0001.png is 4).
-	pre=STRING  - words that appear before the filename, such as "hello" in hello0002.png.
-	end=STRING  - words that appear after the filename, such as "world" in 0025world.png.
-	mob=y/n     - yes or no to use motion blur, will ignore motion blur variables if n.
-	mbf=INTEGER - final fps if using motion blur (for frameblending from high fps). Will trim down to this framerate from the source fps.
-	mfp=INTEGER - number of frames before a new blended frame will be considered.
+	fps=INTEGER - Determines the frames per second of the output. Refers to source fps if motion blur is enabled.
+	num=INTEGER - The number of digits in the input images (For example, 0001.png is 4).
+	pre=STRING  - Words that appear before the filename, such as "hello" in hello0002.png.
+	end=STRING  - Words that appear after the filename, such as "world" in 0025world.png.
+	mob=y/n     - Yes or no to use motion blur, will ignore motion blur variables if n.
+	aud=STRING  - Path to the audio file to use with the video (Will end the video if either the video or audio track ends).
+	mbf=INTEGER - Final fps if using motion blur (For frameblending from high fps). Will trim down to this framerate from the source fps.
+	mfp=INTEGER - Number of frames before a new blended frame will be considered.
 	              for example, an mfp of 10 and framerate of 60 will cause 6 frames to blend into each output frame.
 
 :: -------------------------------------
 
 By opening QuickConv.bat, four variables become available:
-	opsfile - string pointing to the settings file that will be used at runtime (default: QuickConv_op.txt).
+	opsfile - String pointing to the settings file that will be used at runtime (default: QuickConv_op.txt).
 	mbr - Maximum bitrate (only used by the webm and mp4 outputs) (default: 20M).
 	abr - Audio bitrate (default: 196K).
 	filetype - Image source file type (default: png).
