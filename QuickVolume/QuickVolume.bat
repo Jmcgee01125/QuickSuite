@@ -23,7 +23,7 @@ set /p volume=
 
 :: change the audio level
 :: ffmpeg -input filename -codec:video copy -filter:audio "volume=volumelevel" outputname
-ffmpeg -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" "%~n1_qa%~x1"
+ffmpeg -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" "%~n1_qv%~x1"
 exit
 
 :ERROR_file
