@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickExtract Version 1.0
+:: QuickExtract Version 1.0b
 
 :: -------------------------------------
 
@@ -31,8 +31,9 @@ ffmpeg -i %1 -map 0:a "%name%_qe.%Filetype%"
 exit
 
 :ERROR_file
-echo Error: please drag a file onto this program to use it.
-echo If you meant to edit this file to change settings, right click it then select edit.
+echo Error: Please drag a file onto this program to use it.
 echo.
+echo Opening the file to edit settings... (you can safely close this terminal).
+start notepad.exe %0
 pause
 exit

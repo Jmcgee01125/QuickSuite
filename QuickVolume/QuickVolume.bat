@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickVolume Version 1.0
+:: QuickVolume Version 1.0b
 
 :: -------------------------------------
 
@@ -27,6 +27,7 @@ ffmpeg -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" "%~n1_qa%~x1"
 exit
 
 :ERROR_file
-echo Error: please drag a file onto this program to use it.
+echo Error: Please drag a file onto this program to use it.
+echo.
 pause
 exit

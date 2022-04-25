@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.0
+:: QuickTrim Version 1.0b
 
 :: -------------------------------------
 
@@ -107,8 +107,9 @@ pause
 exit
 
 :ERROR_file
-echo Error: please drag a file onto this program to use it.
-echo If you meant to edit this file to change settings, right click it then select edit.
+echo Error: Please drag a file onto this program to use it.
+echo Opening the file to edit settings... (you can safely close this terminal).
+start notepad.exe %0
 echo.
 pause
 exit
