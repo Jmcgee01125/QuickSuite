@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.11b
+:: QuickCompress Version 1.11c
 
 :: -------------------------------------
 
@@ -289,7 +289,7 @@ cls
 echo Failed to encode: target output size exceeded.
 echo Attempting to encode at a lower threshold...
 :: reduce the target size by half the amount we were over the threshold, plus a bit more
-set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize - 50) / 2 + TargetOutputSizeKB
+set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize - 200) / 2 + TargetOutputSizeKB
 echo New target: %TargetOutputSizeKB%
 goto :SMARTMBRCALC
 
