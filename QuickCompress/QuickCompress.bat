@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.11c
+:: QuickCompress Version 1.12
 
 :: -------------------------------------
 
@@ -286,10 +286,11 @@ goto NEW_customaudio
 set /a MaxAttempts=MaxAttempts - 1
 if %MaxAttempts% EQU 0 goto ERR_largeoutcancel
 cls
-echo Failed to encode: target output size exceeded.
+echo Failed to encode: target output size exceeded. (%kbsize% ^> %TargetOutputSizeKB%)
 echo Attempting to encode at a lower threshold...
-:: reduce the target size by half the amount we were over the threshold, plus a bit more
-set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize - 200) / 2 + TargetOutputSizeKB
+:: reduce the target size by twice the amount we were over the threshold and a bit more for good measure
+:: note that this runs on the adjusted output size, not the maximum allowable
+set /a TargetOutputSizeKB=(TargetOutputSizeKB - kbsize) * 2 + TargetOutputSizeKB - 50
 echo New target: %TargetOutputSizeKB%
 goto :SMARTMBRCALC
 
