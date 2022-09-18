@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCrop Version 1.0b
+:: QuickCrop Version 1.0c
 
 :: -------------------------------------
 
@@ -57,4 +57,4 @@ if %errorlevel%==2 (
 	set /p height=
 )
 
-ffmpeg -y -i %1 -vf "crop=%width%:%height%" "%~n1_qcr%~x1"
+ffmpeg -y -i %1 -c:a copy -vf "crop=%width%:%height%" "%~n1_qcr%~x1"
