@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickVolume Version 1.0b
+:: QuickVolume Version 1.0c
 
 :: -------------------------------------
 
@@ -23,7 +23,7 @@ set /p volume=
 
 :: change the audio level
 :: ffmpeg -input filename -codec:video copy -filter:audio "volume=volumelevel" outputname
-ffmpeg -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" "%~n1_qv%~x1"
+ffmpeg -fflags +igndts -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" "%~n1_qv%~x1"
 exit
 
 :ERROR_file

@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.12
+:: QuickCompress Version 1.12b
 
 :: -------------------------------------
 
@@ -126,8 +126,8 @@ if %UseWebm%==1 (
 	:: webm has an issue with certain audio codecs, best to just remux
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
-:: ffmpeg -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
-ffmpeg -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
+:: ffmpeg -flags +ignore DTS to fix audio sync -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
+ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
 exit
 
