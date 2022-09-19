@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCrop Version 1.0c
+QuickCrop Version 1.1
 
 :: -------------------------------------
 
@@ -16,5 +16,7 @@ The output will be saved as <source file>_qcr.<source filetype>
 
 :: -------------------------------------
 
-By opening QuickCrop.bat, one variable becomes available:
+By opening QuickCrop.bat, two variables becomes available:
 	ConfirmResolution - Asks to confirm that the detected crop resolution is correct, or to change it (default: 1).
+	MaxScanTime - The maximum number of seconds to scan the video to determine crop resolution (default: 30).
+		Higher values improve accuracy, but take longer to run.

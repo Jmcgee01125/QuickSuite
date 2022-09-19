@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCrop Version 1.0c
+:: QuickCrop Version 1.1
 
 :: -------------------------------------
 
@@ -14,6 +14,9 @@
 
 :: Should the cropped resolution be prompted before encoding begins? Change from 1 to disable. (default: 1)
 set ConfirmResolution=1
+
+:: Amount of time in seconds to scan for the crop resolution. (default: 30)
+set MaxScanTime=30
 
 :: -------------------------------------
 
@@ -27,8 +30,16 @@ echo Extracted source width (%srcwidth%) and height (%srcheight%)
 
 echo Detecting target resolution...
 
+:: scan for some time, in case it starts with a black screen
+for /f "tokens=2 delims==" %%a in ('ffprobe "%~f1" -show_entries format^=duration -v quiet -of compact') do (
+	set dur=%%a
+)
+if %dur% GTR %MaxScanTime% (
+	set scanlength=%MaxScanTime%
+) else ( set scanlength=%dur% )
+
 :: converted from bash - https://gist.github.com/schocco/21981bc00c37c851e3ca
-for /F "tokens=2 delims==" %%a in ('ffmpeg -hide_banner -i %1 -t 1 -vf cropdetect -f null null 2^>^&1') do (
+for /F "tokens=2 delims==" %%a in ('ffmpeg -hide_banner -i %1 -t %scanlength% -vf cropdetect -f null null 2^>^&1') do (
 	echo %%a | find ":" >nul
 	if errorlevel 1 (echo.>nul) else (set croptarget=%%a)
 )
