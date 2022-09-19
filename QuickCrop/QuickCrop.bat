@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCrop Version 1.1
+:: QuickCrop Version 1.1b
 
 :: -------------------------------------
 
@@ -21,6 +21,11 @@ set MaxScanTime=30
 :: -------------------------------------
 
 :: Code
+
+title QuickCrop
+
+:: if the user didn't give a file, show an error
+if [%1]==[] goto ERROR_file
 
 echo Detecting original resolution...
 
@@ -69,3 +74,12 @@ if %errorlevel%==2 (
 )
 
 ffmpeg -y -i %1 -c:a copy -vf "crop=%width%:%height%" "%~n1_qcr%~x1"
+exit
+
+:ERROR_file
+echo Error: Please drag a file onto this program to use it.
+echo.
+echo Opening the file to edit settings... (you can safely close this terminal).
+start notepad.exe %0
+pause
+exit
