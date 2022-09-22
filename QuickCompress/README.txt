@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.12b
+QuickCompress Version 1.13
 
 :: -------------------------------------
 
@@ -38,6 +38,7 @@ By opening QuickCompress.bat, sixteen variables become available:
 	MaxResHeight - The maximum pixel height of the video, aspect ratio is always preserved (default: 1080).
 	mbr - Maximum bitrate used when UseSmartBitrate is disabled (default: 2000).
 	abr - Audio bitrate used, enter "src" to preserve the original audio bitrate (default: src).
+	MaxCPUCores - The maximum number of CPU cores to use when encoding with the CPU, must be between 0 and 10 (default: 4).
 	UseWebm - Uses webm/VP9 instead of mp4/x264 by default. Takes longer to encode, but has superior compression at low bitrates (default: 0).
 	          Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
 	          Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4

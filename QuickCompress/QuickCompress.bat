@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.12b
+:: QuickCompress Version 1.13
 
 :: -------------------------------------
 
@@ -45,6 +45,9 @@ set mbr=2000
 :: Original audio is preserved for mp4, but webm will automatically remux. It will sound effectively identical.
 :: To use source rate, set as "src" (default: src)
 set abr=src
+
+:: Maximum number of CPU cores to use (0-10) when encoding with the CPU (so, not NVENC). (default: 4)
+set MaxCPUCores=4
 
 :: Use webm (vp9) instead of mp4 (x264). (default: 0)
 :: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
@@ -127,7 +130,7 @@ if %UseWebm%==1 (
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
 :: ffmpeg -flags +ignore DTS to fix audio sync -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
-ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% "%name%_qc.%extension%"
+ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% -cpu-used %MaxCPUCores% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
 exit
 
