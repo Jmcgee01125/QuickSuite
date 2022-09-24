@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCrop Version 1.2
+:: QuickCrop Version 1.2b
 
 :: -------------------------------------
 
@@ -48,7 +48,7 @@ if %dur% GTR %MaxScanTime% (
 if %SeekTime% GTR %dur% set SeekTime=0
 
 :: converted from bash - https://gist.github.com/schocco/21981bc00c37c851e3ca
-for /F "tokens=2 delims==" %%a in ('ffmpeg -hide_banner -ss %SeekTime% -i %1 -t %scanlength% -vf cropdetect -f null null 2^>^&1') do (
+for /F "tokens=2 delims==" %%a in ('ffmpeg -hide_banner -ss %SeekTime% -i %1 -t %scanlength% -vf "cropdetect=24:8:0" -f null null 2^>^&1') do (
 	echo %%a | find ":" >nul
 	if errorlevel 1 (echo.>nul) else (set croptarget=%%a)
 )
