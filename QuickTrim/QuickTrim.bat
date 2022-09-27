@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.2
+:: QuickTrim Version 1.2b
 
 :: -------------------------------------
 
@@ -89,10 +89,7 @@ if "%end%" NEQ "" set end=-to %end%
 goto TRIM
 
 :TRIM
-set mode=-c copy
-if "%Reencode%"=="1" set mode=-c:v %ReencodeCodec% -c:a copy
-echo 
-ffmpeg -ss %start% -i %1 %end% %mode% "%~n1_trim%~x1"
+ffmpeg -ss %start% -i %1 %end% -c copy "%~n1_trim%~x1"
 pause
 exit
 
