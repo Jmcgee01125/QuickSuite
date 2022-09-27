@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.1
+:: QuickTrim Version 1.2
 
 :: -------------------------------------
 
@@ -15,10 +15,6 @@
 :: Advanced input for manually entering hh:mm:ss.ms arguments. Faster for technical users, but less streamlined. (Default: 0)
 set UseManualInput=0
 
-:: Force reencode the video. This is slower, but prevents freezing at the beginning when a keyframe was cut from the video. (Default: 0, libx264)
-set Reencode=0
-set ReencodeCodec=libx264
-
 :: -------------------------------------
 
 :: Code
@@ -27,12 +23,6 @@ title QuickTrim
 
 :: if the user didn't give a file, show an error
 if [%1]==[] goto ERROR_file
-
-:: get the name of the file for the output to match
-set name=%~n1%
-
-:: get the extension of the file for the output to share the same container
-set ext=%~x1%
 
 :: get the video duration in seconds
 :: go go gadget copy paste - https://stackoverflow.com/questions/32344947/ffmpeg-batch-extracting-media-duration-and-writing-to-a-text-file
@@ -101,8 +91,8 @@ goto TRIM
 :TRIM
 set mode=-c copy
 if "%Reencode%"=="1" set mode=-c:v %ReencodeCodec% -c:a copy
-echo ffmpeg -i %1 -ss %start% %end% %mode% "%name%_trim%ext%"
-ffmpeg -i %1 -ss %start% %end% %mode% "%name%_trim%ext%"
+echo 
+ffmpeg -ss %start% -i %1 %end% %mode% "%~n1_trim%~x1"
 pause
 exit
 
