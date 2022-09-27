@@ -2,11 +2,18 @@
 
 :: -------------------------------------
 
-:: QuickVolume Version 1.0c
+:: QuickVolume Version 1.0d
 
 :: -------------------------------------
 
 :: USAGE: Drag a video file onto this program and type a percentage to change the volume
+
+:: -------------------------------------
+
+:: Settings
+
+:: If set (not blank), use this as the audio bitrate in Kbps. (Default: )
+set abr=
 
 :: -------------------------------------
 
@@ -21,13 +28,17 @@ if [%1]==[] goto ERROR_file
 echo Type a percentage of audio (10%%, 125%%, etc.), but leave out the %% sign (e.g. 125), then press enter.
 set /p volume=
 
+:: get the source audio bitrate
+if [%abr%] NEQ [] set abr=-b:a %abr%K
+
 :: change the audio level
-:: ffmpeg -input filename -codec:video copy -filter:audio "volume=volumelevel" outputname
-ffmpeg -fflags +igndts -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" "%~n1_qv%~x1"
+ffmpeg -i "%~f1" -c:v copy -filter:a "volume=%volume%/100" %abr% "%~n1_qv%~x1"
 exit
 
 :ERROR_file
 echo Error: Please drag a file onto this program to use it.
+echo Opening the file to edit settings... (you can safely close this terminal).
+start notepad.exe %0
 echo.
 pause
 exit

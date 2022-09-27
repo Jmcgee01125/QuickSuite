@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickVolume Version 1.0c
+QuickVolume Version 1.0d
 
 :: -------------------------------------
 
@@ -15,4 +15,5 @@ The output will be saved as <source file>_qv.<source extension>
 
 :: -------------------------------------
 
-There are no variables inside of QuickVolume.bat
+By opening QuickVolume.bat, one variable becomes available:
+	abr - Optional override for the output audio bitrate, useful for webm (default: ).
