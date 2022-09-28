@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCrop Version 1.2b
+:: QuickCrop Version 1.2c
 
 :: -------------------------------------
 
@@ -42,10 +42,15 @@ echo Detecting target resolution...
 for /f "tokens=2 delims==" %%a in ('ffprobe "%~f1" -show_entries format^=duration -v quiet -of compact') do (
 	set dur=%%a
 )
-if %dur% GTR %MaxScanTime% (
-	set scanlength=%MaxScanTime%
-) else ( set scanlength=%dur% )
-if %SeekTime% GTR %dur% set SeekTime=0
+for /f "delims=." %%a in ("%dur%") do (
+	set durseconds=%%a
+	goto CURSED_SECOND_LENGTH_EXTRACTION
+)
+:CURSED_SECOND_LENGTH_EXTRACTION
+if %MaxScanTime% GTR %durseconds% (
+	set scanlength=%durseconds%
+) else ( set scanlength=%MaxScanTime% )
+if %SeekTime% GTR %durseconds% set SeekTime=0
 
 :: converted from bash - https://gist.github.com/schocco/21981bc00c37c851e3ca
 for /F "tokens=2 delims==" %%a in ('ffmpeg -hide_banner -ss %SeekTime% -i %1 -t %scanlength% -vf "cropdetect=24:8:0" -f null null 2^>^&1') do (
