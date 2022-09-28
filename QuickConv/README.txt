@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickConv Version 1.6b
+QuickConv Version 1.7
 
 :: -------------------------------------
 
@@ -47,8 +47,12 @@ Current options are the following:
 
 By opening QuickConv.bat, four variables become available:
 	opsfile - String pointing to the settings file that will be used at runtime (default: QuickConv_op.txt).
-	mbr - Maximum bitrate (only used by the webm and mp4 outputs) (default: 20M).
-	abr - Audio bitrate (default: 196K).
+	mbr - Maximum bitrate (only used by the webm and mp4 outputs) (default: 10M).
+	crf - CRF to use instead of mbr, will override mbr (for webm and mp4 outputs) (default: 20).
+	buf - CRF buffer size for webm (default: 4M).
+	mrate - CRF maximum rate for webm (default: 10M).
+	trate - CRF target rate for webm (default: 5M).
+	abr - Audio bitrate (default: 192K).
 	filetype - Image source file type (default: png).
 
 :: -------------------------------------

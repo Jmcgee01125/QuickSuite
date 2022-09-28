@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickConv Version 1.6b
+:: QuickConv Version 1.7
 
 :: -------------------------------------
 
@@ -16,12 +16,24 @@
 :: That file is formatted as two lines with fps=XX and num=XX
 set opsfile=QuickConv_op.txt
 
-:: Maximum bitrate for webm and mp4 (default: 20M)
+:: Bitrate for webm and mp4 (default: 10M)
 :: Formatted as "20M" or "100K"
-set mbr=20M
+set mbr=10M
 
-:: Audio bitrate (default: 196K)
-set abr=196K
+:: CRF for webm and mp4 (default: 20)
+:: If not blank, mbr is COMPLETELY IGNORED
+set crf=20
+
+:: Additional options for CRF with webm
+:: buf is the buffer size (default: 4M)
+:: mrate is the maximum bitrate (default: 10M)
+:: trate is the target bitrate (default: 5M)
+set buf=4M
+set mrate=10M
+set trate=5M
+
+:: Audio bitrate (default: 192K)
+set abr=192K
 
 :: Source image file type (default: png)
 set filetype=png
@@ -48,19 +60,21 @@ echo 4 - mp4  (cpu x264)   - small file size
 echo 5 - mp4  (gpu nvenc)  - small file size, fastest, requires nvenc-enabled GPU
 echo 6 - CANCEL OPERATION
 choice /c 123456 /m "Make a selection"
-:: for some insane reason ==3 means >=3 when comparing errorlevel, so we have to reverse this
 if %errorlevel%==6 (
 	exit
 ) else if %errorlevel%==5 (
 	set bitrate=-b:v %mbr%
+	if [%crf%] NEQ [] set bitrate=-crf %crf%
 	set codec=h264_nvenc
 	set outtype=mp4
 ) else if %errorlevel%==4 (
 	set bitrate=-b:v %mbr%
+	if [%crf%] NEQ [] set bitrate=-crf %crf%
 	set codec=libx264
 	set outtype=mp4
 ) else if %errorlevel%==3 (
 	set bitrate=-b:v %mbr%
+	if [%crf%] NEQ [] set bitrate=-crf %crf% -b:v %trate% -maxrate %mrate% -bufsize %buf%
 	set codec=vp9
 	set outtype=webm
 ) else if %errorlevel%==2 (
@@ -71,8 +85,8 @@ if %errorlevel%==6 (
 	set bitrate=
 	set codec=rawvideo
 	set outtype=avi
-) 
-:: ffmpeg -framerate fps -logsize -input filenamerangefromhell -input audiofile -videofilters format=colorspace motionblur=settings -r newfps -videobitrate -videocodec outputfile
+)
+
 ffmpeg -framerate %fps% -thread_queue_size 128K -i "%pre%%%0%num%d%end%.%filetype%" %aud% -filter:v "format=yuv420p%mbops%" %mbf% %bitrate% -c:v %codec% -b:a %abr% -shortest output.%outtype%
 exit
 
