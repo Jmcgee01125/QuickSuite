@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.2b
+:: QuickTrim Version 1.2c
 
 :: -------------------------------------
 
@@ -89,7 +89,7 @@ if "%end%" NEQ "" set end=-to %end%
 goto TRIM
 
 :TRIM
-ffmpeg -ss %start% -i %1 %end% -c copy "%~n1_trim%~x1"
+ffmpeg -ss %start% %end% -i %1 -c copy "%~n1_trim%~x1"
 pause
 exit
 
