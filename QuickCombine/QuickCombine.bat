@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCombine Version 1.1b
+:: QuickCombine Version 1.2
 
 :: -------------------------------------
 
@@ -13,14 +13,19 @@
 
 :: Settings
 
-:: Use nvenc (GPU mp4/h264) instead of CPU (default: 0)
+:: Use nvenc (GPU mp4/h264) instead of CPU (default: 1)
 :: Can be faster than a CPU encode, but might not be supported on all systems.
 :: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
-set UseNVENC=0
+set UseNVENC=1
 
 :: The video extension to use (default: mp4)
 :: If you set this to anything else, you MUST disable UseNVENC.
 set ext=mp4
+
+:: Use a copy codec for combining, priority over NVENC (default: 0)
+:: Preserves quality but requires all source files to be the same codec.
+:: This does NOT work for mp4 source files due to how the container works.
+set UseCopy=0
 
 :: -------------------------------------
 
@@ -44,28 +49,36 @@ for %%X in (%*) do (
 	set /a argnum+=1
 )
 
+if !argnum! GTR 9 goto ERROR_toomanyarguments
+
 :: print videos and their indexes for the user
-:: could be combined with the above but separated for readability
+:: could be combined with the above but separated for "readability"
 for /l %%N in (1,1,%argnum%) do (
 	call echo %%N - %%^~n%%N%%^~x%%N
 )
 
 :: get the user video order
 set vidargs=
+set concatargs=
 echo Please enter the number of which video should come first (then second, third, and so on).
 echo Press enter after each number.
 for /l %%N in (1,1,%argnum%) do (
 	set /p cur=
 	call set vidargs=!vidargs! -i %%!cur!
+	call set concatargs=!concatargs!]%%^~n!cur!%%^~x!cur!
 )
+set concatargs=!concatargs:]=^|!
+set concatargs=concat:!concatargs:~1!
 
 :COMBINE
-:: If using NVENC, specify it. Otherwise, will let ffmpeg decide
 set codec=
 if %UseNVENC%==1 set codec=-c:v h264_nvenc
 :: go go gadget how does ffmpeg work https://blog.feurious.com/concatenate-videos-together-using-ffmpeg
 :: ffmpeg -i file1 -i file2 <continues per file> -filter_complex "[0:v][0:a][1:v][1:a]<continues per file> concat=n=<filecount>:v=1:a=1 [outv] [outa]" -map "[outv]" -map "[outa]" -c:v <encoding codec> <filename>.<extension>
-ffmpeg -y %vidargs% -filter_complex "%streamslabel% concat=n=%argnum%:v=1:a=1 [outv] [outa]" -map "[outv]" -map "[outa]" %codec% QuickCombine_output.%ext%
+set command=ffmpeg -y %vidargs% -filter_complex "%streamslabel% concat=n=%argnum%:v=1:a=1 [outv] [outa]" -map "[outv]" -map "[outa]" %codec% QuickCombine_output.%ext%
+if %UseCopy%==1 set command=ffmpeg -y -i "%concatargs%" -c copy QuickCombine_output.%ext%
+%command%
+pause
 exit
 
 :CHECKNVENC
@@ -85,6 +98,12 @@ goto RETURNINTRO_NVENC
 echo Error: Please drag a file onto this program to use it.
 echo Opening the file to edit settings... (you can safely close this terminal).
 start notepad.exe %0
+echo.
+pause
+exit
+
+:ERROR_toomanyarguments
+echo Error: Maximum number of files that can be concatenated is 9 (blame Microsoft's poor Batch arguments implementation).
 echo.
 pause
 exit

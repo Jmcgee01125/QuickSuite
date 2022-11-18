@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCombine Version 1.0b
+QuickCombine Version 1.2
 
 :: -------------------------------------
 
@@ -20,7 +20,9 @@ The output will be saved as QuickCombine_output.<type selection>
 
 :: -------------------------------------
 
-By opening QuickCombine.bat, two variables become available:
-	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 0).
+By opening QuickCombine.bat, three variables become available:
+	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 1).
 	           QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
 	ext - Output file type (default: mp4).
+	UseCopy - Directly copy the input files to the output, the fastest and most detailed (default: 0).
+	          Note that mp4 does not support this mode due to how the container works, hence it is disabled by default.
