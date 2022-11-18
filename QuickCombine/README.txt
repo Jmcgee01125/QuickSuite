@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCombine Version 1.2b
+QuickCombine Version 1.4
 
 :: -------------------------------------
 
@@ -14,13 +14,11 @@ To use, select all of the videos you want to combine and drag them onto QuickCom
 	Enter the number (such as "2") of the video in the list given, then press enter.
 	Do not enter a blank, even if the argument order is the intended order, numbers must be entered.
 
-You are responsible for making sure that all selected items are videos.
+You are responsible for making sure that all items are videos and have the same file extension.
 
-The output will be saved as QuickCombine_output.<type selection>
+The output will be saved as QuickCombine_output.<ext>
 
 :: -------------------------------------
 
-By opening QuickCombine.bat, two variables become available:
-	UseNVENC - Uses the nvenc encoder on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 0).
-	           QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
-	ext - Output file type (default: mp4).
+By opening QuickCombine.bat, one variable becomes available:
+	ext - Output file type, should match the source files that you're using (default: mp4).
