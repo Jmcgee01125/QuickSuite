@@ -12,8 +12,8 @@ A collection of batch tools to do various tasks quickly, with a special focus on
 * **QuickCrop:** automatically detects and crops letter/pillarboxing from a video.
 * **QuickExtract:** extracts audio from a video file.  
 * **QuickNote:** creates a note-taking file in an arbitrary directory from anywhere on the computer without having to save-as.  
-* **QuickTrim:** trims a video based on user-selected timestamps, with or without re-encoding for quality or speed.  
-* **QuickVolume:** changes the volume of a video's audio without re-encoding the entire thing.
+* **QuickTrim:** trims a video based on user-selected timestamps without needing to re-encode.  
+* **QuickVolume:** changes the volume of a video's audio without needing to re-encode the video.
 
 ---
 
