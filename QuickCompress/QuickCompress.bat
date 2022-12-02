@@ -103,7 +103,7 @@ if %UseMaxFPS%==1 (if %fps% GTR %MaxFPS% set fps=%MaxFPS%)
 
 :: get the source resolution
 for /f "usebackq delims=" %%a in (`ffprobe -v error -select_streams v:0 -show_entries stream^=height -of default^=noprint_wrappers^=1:nokey^=1 "%~f1"`) do set height=%%a
-:: if the source FPS is higher than the maximum allowed FPS, reduce it
+:: if the source res is higher than the maximum allowed res, reduce it
 if %UseMaxResolution%==1 ( if %height% GTR %MaxResHeight% set height=%MaxResHeight% )
 
 if %UseSmartBitrate%==1 goto SMARTMBRCALC

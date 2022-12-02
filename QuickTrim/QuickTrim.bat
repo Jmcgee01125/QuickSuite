@@ -89,7 +89,7 @@ if "%end%" NEQ "" set end=-to %end%
 goto TRIM
 
 :TRIM
-ffmpeg -ss %start% %end% -i %1 -c copy -avoid_negative_ts make_zero -fflags +genpts  "%~n1_trim%~x1"
+ffmpeg -ss %start% %end% -i %1 -c copy -avoid_negative_ts make_zero -fflags +genpts "%~n1_trim%~x1"
 pause
 exit
 
