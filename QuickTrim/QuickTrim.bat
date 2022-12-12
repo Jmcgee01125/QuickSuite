@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.2d
+:: QuickTrim Version 1.3
 
 :: -------------------------------------
 
@@ -14,6 +14,10 @@
 
 :: Advanced input for manually entering hh:mm:ss.ms arguments. Faster for technical users, but less streamlined. (Default: 0)
 set UseManualInput=0
+
+:: Disable audio desync fix. (Default: 0)
+:: In certain cases, the desync fix causes it to be impossible to trim the first few seconds of a video. Set this to 1 to fix, though audio may desync.
+set DisableAudioDesyncFix=0
 
 :: -------------------------------------
 
@@ -89,7 +93,9 @@ if "%end%" NEQ "" set end=-to %end%
 goto TRIM
 
 :TRIM
-ffmpeg -ss %start% %end% -i %1 -c copy -avoid_negative_ts make_zero -fflags +genpts "%~n1_trim%~x1"
+set desyncfix=
+if %DisableAudioDesyncFix% NEQ 1 do set desyncfix=-avoid_negative_ts make_zero -fflags +genpts
+ffmpeg -ss %start% %end% -i %1 -c copy %desyncfix% "%~n1_trim%~x1"
 pause
 exit
 
