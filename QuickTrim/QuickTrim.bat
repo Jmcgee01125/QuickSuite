@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.3
+:: QuickTrim Version 1.3b
 
 :: -------------------------------------
 
@@ -94,7 +94,7 @@ goto TRIM
 
 :TRIM
 set desyncfix=
-if %DisableAudioDesyncFix% NEQ 1 do set desyncfix=-avoid_negative_ts make_zero -fflags +genpts
+if %DisableAudioDesyncFix% NEQ 1 set desyncfix=-avoid_negative_ts make_zero -fflags +genpts
 ffmpeg -ss %start% %end% -i %1 -c copy %desyncfix% "%~n1_trim%~x1"
 pause
 exit
