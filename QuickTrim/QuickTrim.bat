@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickTrim Version 1.3b
+:: QuickTrim Version 1.3c
 
 :: -------------------------------------
 
@@ -13,7 +13,7 @@
 :: Settings
 
 :: Advanced input for manually entering hh:mm:ss.ms arguments. Faster for technical users, but less streamlined. (Default: 0)
-set UseManualInput=0
+set UseManualInput=1
 
 :: Disable audio desync fix. (Default: 0)
 :: In certain cases, the desync fix causes it to be impossible to trim the first few seconds of a video. Set this to 1 to fix, though audio may desync.
@@ -81,7 +81,7 @@ set end=-to %h2%:%m2%:%s2%.%ms2%
 goto TRIM
 
 :MANUALINPUT
-echo Program is running in advanced mode.
+echo Program is running in advanced mode. (To disable, set UseManualInput to 0).
 echo Please follow the format hh:mm:ss.ms (you may omit hh:, mm:, and/or .ms if applicable)
 echo Your video duration is %h2%:%m2%:%s2%.%ms2%
 echo Enter start time, or nothing for unchanged.
