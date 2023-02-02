@@ -22,7 +22,8 @@ A collection of batch tools to do various tasks quickly, with a special focus on
 **!! YOU MUST INSTALL FFMPEG TO USE MOST OF THESE PROGRAMS**  
 
 You can find instructions to download FFmpeg [here](https://docs.google.com/document/d/1Oex7va4IURjw17OT2MK3FHZgC6iVoInT6ZVuctyZ-uI/).  
-Or download it yourself from https://ffmpeg.org/download.html.  
+Alternatively, run the provided installer script (Will install to AppData/Local and place itself on your user PATH).  
+Or you can download it yourself from https://ffmpeg.org/download.html.  
 
 Make sure to add it to your system's path variable. The guide covers this as well, or you can go edit environment variables yourself if familiar.  
 
