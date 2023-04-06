@@ -27,8 +27,8 @@ If the output is larger than the target, the program will attempt to re-encode w
 
 By opening QuickCompress.bat, sixteen variables become available:
 	UseSmartBitrate - Automatically determines the bitrate to obtain a given file size (default: 1).
-	TargetOutputSizeKB - The initial encoding target in KB, usually the same as MaxOutputSizeKB (default: 8192).
-	MaxOutputSizeKB - The maximum size, in KB, of the output file. 8192 KB = 8 MB, the Discord file limit (default: 8192). 
+	TargetOutputSizeKB - The initial encoding target in KB, usually the same as MaxOutputSizeKB (default: 25600).
+	MaxOutputSizeKB - The maximum size, in KB, of the output file. 25600 KB = 25 MB, the Discord file limit (default: 25600). 
 	MaxAttempts - Number of times the program will attempt more restrictive bitrates before displaying a failure to hit size target (default: 3).
 	WarnForLowDetailThresholdMP4 - If the bitrate is below this number when using mp4, warn the user. Prevents terrible quality output (default: 1024).
 	WarnForLowDetailThresholdWebm - Same as above, but for automatic bitrate of Webm (default: 256).
