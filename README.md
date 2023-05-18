@@ -4,7 +4,7 @@ A collection of batch tools to do various tasks quickly, with a special focus on
 
 ---
 
-## CURRENT TOOLS 
+## Tools 
 
 * **QuickCombine:** concatenates videos using a user-defined order.  
 * **QuickCompress:** automatically compresses videos below a certain size, which is useful for sending videos on size-restricted platforms like Discord.  
@@ -17,7 +17,7 @@ A collection of batch tools to do various tasks quickly, with a special focus on
 
 ---
 
-## FFMPEG NOTE 
+## FFmpeg
 
 **!! YOU MUST INSTALL FFMPEG TO USE MOST OF THESE PROGRAMS**  
 
@@ -31,7 +31,7 @@ Alternatively, you can instead run these batch files in the FFmpeg/bin folder (w
 
 ---
 
-## VARIABLE USAGE NOTE 
+## Program Variables
 
 All of these programs contain variables inside the batch files themselves. You may need to change these for the program to work how you want it to.  
 
