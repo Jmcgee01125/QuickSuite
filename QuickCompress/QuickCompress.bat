@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.13
+:: QuickCompress Version 1.14
 
 :: -------------------------------------
 
@@ -54,9 +54,8 @@ set MaxCPUCores=4
 :: Has a higher priority than NVENC, if both are enabled.
 set UseWebm=0
 
-:: Use nvenc (GPU h264_nvenc) instead of CPU. (default: 1)
-:: Can be faster than a CPU encode, but might not be supported on all systems.
-:: Can still be enabled if not present, will simply turn itself back off after a check. Best to leave this on unless the check causes issues.
+:: Use NVENC (GPU h264_nvenc) instead of CPU. (default: 1)
+:: Faster than a CPU encode, but requires an Nvidia GPU. If you do not have an Nvidia GPU, disable this setting!
 set UseNVENC=1
 
 :: Enables a motion blur effect created by blending frames around the current frame.
@@ -90,9 +89,6 @@ set failcount=0
 set isSrcAud=0
 if "%abr%"=="src" goto FINDSRCABR
 :RETURNINTRO_ABR
-
-if %UseNVENC%==1 goto CHECKNVENC
-:RETURNINTRO_NVENC
 
 :: get the source FPS
 :: go go gadget copy paste https://stackoverflow.com/questions/27792934/get-video-fps-using-ffprobe
@@ -191,27 +187,6 @@ for /f "usebackq delims=" %%a in (`ffprobe -v 0 -select_streams a:0 -show_entrie
 set /a abr=abr / 1000
 set srcabr=%abr%
 goto RETURNINTRO_ABR
-
-:CHECKNVENC
-:: print status message due to potential lag if it's a really slow cpu
-echo Checking for nvenc support...
-setlocal enabledelayedexpansion
-set found=0
-:: heavily modified (read: translated) from https://gist.github.com/Brainiarc7/c6164520f082c27ae7bbea9556d4a3ba
-for /f "usebackq delims=" %%a in (`ffmpeg -hide_banner -encoders`) do (
-	:: cursed https://stackoverflow.com/questions/34077831/how-to-see-if-a-string-contains-a-substring-using-batch
-	set codec=%%a
-	set codecsubstringed=x!codec:h264_nvenc=!
-	if not !codecsubstringed!==x!codec! set found=1
-)
-:: local schenanigans to extract the variable %found% to set %UseNVENC%
-(
-	endlocal
-	set "found=%found%"
-)
-:: if no nvenc, no nvenc
-if %found%==0 set UseNVENC=0
-goto RETURNINTRO_NVENC
 
 :: if multiple arguments were passed, make quickcompress threads for them
 :: note that these threads MUST be closed with exit to kill their console, do not just let the batch file end

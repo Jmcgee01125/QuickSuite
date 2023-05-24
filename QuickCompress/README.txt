@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.13
+QuickCompress Version 1.14
 
 :: -------------------------------------
 
@@ -43,7 +43,7 @@ By opening QuickCompress.bat, sixteen variables become available:
 	          Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
 	          Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
 	UseNVENC - Uses the nvenc encoder (h264_nvenc) on the GPU instead of a CPU encoder. MUCH faster, but not available for all systems (default: 1).
-	           QuickCompress runs a check when starting if UseNVENC=1, to prevent an abnormal crash.
+	           If you do not have an Nvidia GPU, this option will cause QuickCompress to fail.
 	UseMB - Applies a frameblended motionblur effect to the final output (default: 0).
 	        This feature is automatically disabled during runtime if UseMaxResolution is enabled, as they are incompatible.
 	MBFrames - If using motionblur, specifies the number of frames to blend (default: 2).
