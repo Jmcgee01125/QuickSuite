@@ -12,7 +12,7 @@
 
 :: Settings
 
-:: Automatically determines maximum bitrate based on the target output size in KB. (defaults: 1, 25600, 25600, 3, 1024, 256)
+:: Automatically determines maximum bitrate based on the target output size in KB. (defaults: 1, 10240, 10240, 3, 1024, 256)
 :: MaxOutputSizeKB is the maximum allowed size of the output.
 :: MaxOutputSizeKB should ALWAYS be greater than or equal to TargetOutputSizeKB.
 :: TargetOutputSizeKB is the initial encoding target, usually the same as MaxOutputSizeKB.
@@ -20,8 +20,8 @@
 :: MaxAttempts is the number of times to attempt recompressing if the file exceeds the target size.
 :: To disable, set UseSmartBitrate to 0
 set UseSmartBitrate=1
-set MaxOutputSizeKB=25600
-set TargetOutputSizeKB=25600
+set MaxOutputSizeKB=10240
+set TargetOutputSizeKB=10240
 set MaxAttempts=3
 set WarnForLowDetailThresholdMP4=1024
 set WarnForLowDetailThresholdWebm=256
