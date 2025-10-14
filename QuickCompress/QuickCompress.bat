@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.14
+:: QuickCompress Version 1.15
 
 :: -------------------------------------
 
@@ -46,8 +46,9 @@ set mbr=2000
 :: To use source rate, set as "src" (default: src)
 set abr=src
 
-:: Maximum number of CPU cores to use (0-10) when encoding with the CPU (so, not NVENC). (default: 4)
-set MaxCPUCores=4
+:: Maximum number of CPU cores to use when encoding with the CPU (so, not NVENC). (default: 6)
+:: Set to 0 to disable this limit and use as much processing as FFmpeg prefers.
+set CPUCores=6
 
 :: Use webm (vp9) instead of mp4 (x264). (default: 0)
 :: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
@@ -90,6 +91,9 @@ set isSrcAud=0
 if "%abr%"=="src" goto FINDSRCABR
 :RETURNINTRO_ABR
 
+:: set maximum amount of CPU, with disable logic
+if %CPUCores% gtr 0 set cpulimit=-threads %CPUCores%
+
 :: get the source FPS
 :: go go gadget copy paste https://stackoverflow.com/questions/27792934/get-video-fps-using-ffprobe
 :: ffmpeg returns a precise fraction (like 30000/1001), so we do some math
@@ -126,7 +130,7 @@ if %UseWebm%==1 (
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
 :: ffmpeg -flags +ignore DTS to fix audio sync -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
-ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% -cpu-used %MaxCPUCores% -threads %MaxCPUCores% "%name%_qc.%extension%"
+ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% %cpulimit% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
 exit
 
