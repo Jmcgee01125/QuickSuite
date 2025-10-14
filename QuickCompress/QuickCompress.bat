@@ -126,7 +126,7 @@ if %UseWebm%==1 (
 	set audcom=-b:a %abr%K
 ) else ( if %UseNVENC%==1 set codec=h264_nvenc )
 :: ffmpeg -flags +ignore DTS to fix audio sync -overwrite -input filename -bitrate:video mbr (-bitrate:audio abr or -codec:audio copy) (filterops) -codec:video codec -framerate fps outputname
-ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% -cpu-used %MaxCPUCores% "%name%_qc.%extension%"
+ffmpeg -fflags +igndts -y -i "%~f1" -b:v %mbr%K %audcom% %filterops% -c:v %codec% -r %fps% -cpu-used %MaxCPUCores% -threads %MaxCPUCores% "%name%_qc.%extension%"
 if %UseSmartBitrate%==1 goto CHECKOUTPUTSIZE
 exit
 
