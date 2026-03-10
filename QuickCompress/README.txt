@@ -1,7 +1,7 @@
 
 :: -------------------------------------
 
-QuickCompress Version 1.15
+QuickCompress Version 1.16
 
 :: -------------------------------------
 
@@ -31,7 +31,7 @@ By opening QuickCompress.bat, sixteen variables become available:
 	MaxOutputSizeKB - The maximum size, in KB, of the output file. 10240 KB = 10 MB, the Discord file limit (default: 10240).
 	MaxAttempts - Number of times the program will attempt more restrictive bitrates before displaying a failure to hit size target (default: 3).
 	WarnForLowDetailThresholdMP4 - If the bitrate is below this number when using mp4, warn the user. Prevents terrible quality output (default: 1024).
-	WarnForLowDetailThresholdWebm - Same as above, but for automatic bitrate of Webm (default: 256).
+	WarnForLowDetailThresholdWebm - Same as above, but for automatic bitrate of webm (default: 256).
 	UseMaxFPS - Enables using a maximum framerate, frames beyond this will be discarded (default: 1).
 	MaxFPS - If UseMaxFPS is enabled, this is the maximum framerate. Lower framerates are kept as-is (default: 30).
 	UseMaxResolution - Enables using a maximum resolution, videos of a higher res will be shrunk (default: 1).
@@ -39,11 +39,12 @@ By opening QuickCompress.bat, sixteen variables become available:
 	mbr - Maximum bitrate used when UseSmartBitrate is disabled (default: 2000).
 	abr - Audio bitrate used, enter "src" to preserve the original audio bitrate (default: src).
 	CPUCores - The maximum number of CPU cores to use when encoding with the CPU, 0 to disable (default: 6).
-	UseWebm - Uses webm/VP9 instead of mp4/x264 by default. Takes longer to encode, but has superior compression at low bitrates (default: 0).
+	UseWebm - Uses VP9/AV1 instead of x264/H264 by default. Takes longer to encode on the CPU (VP9), but has superior compression at low bitrates (default: 0).
 	          Useful if you're commonly encoding long videos and trying to fit it into a small filesize without giant compression blocks.
-	          Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4
-	UseNVENC - Uses the NVENC encoder (h264_nvenc) on the GPU instead of a CPU encoder. Much faster, but not available for all systems (default: 1).
+	          Note that you can still use webm on the fly if the bitrate is below WarnForLowDetailThresholdMP4.
+	UseNVENC - Uses the NVENC encoder (h264_nvenc/av1_nvenc) on the GPU instead of a CPU encoder. Much faster, but not available for all systems (default: 1).
 	           If you do not have an Nvidia GPU, this option will cause QuickCompress to fail. Set it to 0 instead.
+			   If your GPU does not support native AV1 encode, using webm will fail. Set this to 0 before attempting webm encodes.
 	UseMB - Applies a frameblended motionblur effect to the final output (default: 0).
 	        This feature is automatically disabled during runtime if UseMaxResolution is enabled, as they are incompatible.
 	MBFrames - If using motionblur, specifies the number of frames to blend (default: 2).

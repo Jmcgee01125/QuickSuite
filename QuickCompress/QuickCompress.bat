@@ -2,7 +2,7 @@
 
 :: -------------------------------------
 
-:: QuickCompress Version 1.15
+:: QuickCompress Version 1.16
 
 :: -------------------------------------
 
@@ -50,12 +50,11 @@ set abr=src
 :: Set to 0 to disable this limit and use as much processing as FFmpeg prefers.
 set CPUCores=6
 
-:: Use webm (vp9) instead of mp4 (x264). (default: 0)
-:: Not recommended for quick compressions, but can achieve higher detail at lower bitrates.
-:: Has a higher priority than NVENC, if both are enabled.
+:: Use webm (vp9/av1) instead of mp4 (x264/h264). (default: 0)
+:: If UseNVENC is enabled, uses av1 (your GPU must support this!), otherwise uses vp9 on the CPU (much slower and worse).
 set UseWebm=0
 
-:: Use NVENC (GPU h264_nvenc) instead of CPU. (default: 1)
+:: Use NVENC (GPU h264_nvenc or av1_nvenc) instead of CPU. (default: 1)
 :: Faster than a CPU encode, but requires an Nvidia GPU. If you do not have an Nvidia GPU, disable this setting!
 set UseNVENC=1
 
@@ -124,7 +123,11 @@ set extension=mp4
 set audcom=-b:a %abr%K
 if %isSrcAud%==1 ( set audcom=-c:a copy )
 if %UseWebm%==1 (
-	set codec=vp9
+	if %UseNVENC%==1 (
+		set codec=av1_nvenc
+	) else (
+		set codec=vp9
+	)
 	set extension=webm
 	:: webm has an issue with certain audio codecs, best to just remux
 	set audcom=-b:a %abr%K
@@ -221,7 +224,7 @@ goto SMARTMBRCALC
 
 :WARN_confirmlowdetailwebm
 cls
-echo Warning: Webm video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdWebm% Kbps).
+echo Warning: webm video bitrate is very low (%mbr% ^<= %WarnForLowDetailThresholdWebm% Kbps).
 echo This will drastically affect the video quality.
 choice /c WAC /m "Do you wish to continue with webm (w), change the audio bitrate (a), or cancel (c)"
 if %errorlevel%==3 exit
